@@ -1,0 +1,67 @@
+<odoo>
+    <record  id="stock_picking_form_inherit" model="ir.ui.view">
+      <field name="name">stock_picking_form_inherit</field>
+      <field name="model">stock.picking</field>
+      <field name="inherit_id" ref="stock.view_picking_form"/>
+      <field name="arch" type="xml">
+          <header position="inside">
+            <!--
+              <button string="Cambiar a borrador" type="object" class="oe_highlight" name="action_set_to_draft"
+              attrs="{'invisible': [('state', 'in', ('draft','done'))]}"
+              groups="stock.group_stock_manager"/>
+              <button string="Crear OUT" type="object" class="oe_highlight" name="action_create_related_out"
+              groups="stock.group_stock_manager"
+              attrs="{'invisible': ['|', ('state', 'in', ('draft','done','cancel')), ('out_move', '!=', False)]}"/>
+              <button string="Crear INT" type="object" class="oe_highlight" name="action_create_related_int"
+              groups="stock.group_stock_manager"
+              attrs="{'invisible': ['|', ('state', '!=', 'done'), ('in_move', '!=', True)]}"/>
+              -->
+            <!-- Botón OUT solo si es movimiento PICK -->
+            <button name="action_create_related_out"
+                    string="Crear OUT"
+                    type="object"
+                    invisible="state != 'done' or not pick_move"
+                    groups="almx_stock_extends.group_almx_manual_out_creator"
+                    class="btn-warning"/>
+            <!-- Botón INT solo si es movimiento IN -->
+            <button name="action_create_related_int"
+                    string="Crear INT"
+                    type="object"
+                    invisible="state != 'done' or not in_move"
+                    groups="stock.group_stock_manager"
+                    class="btn-warning"/>
+            <!-- Botón "Cambiar a borrador" si el estado no es draft ni done -->
+            <button name="action_set_to_draft"
+                    string="Cambiar a borrador"
+                    type="object"
+                    invisible="state in ('draft', 'done')"
+                    groups="stock.group_stock_manager"
+                    class="btn-warning"/>
+          </header>
+          <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_returns" type="object" class="oe_stat_button" icon="fa-undo"
+                        invisible="return_count == 0">
+                    <field name="return_count" widget="statinfo" string="Devoluciones"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']//field[@name='quantity']" position="after">
+                <field name="returned_qty" string="Devuelto" optional="show"/>
+            </xpath>
+          <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="related_out_id" readonly="state != 'draft'"/>
+                <field name="related_pick_id" readonly="state != 'draft'"/>
+                <field name="detect_move_type" invisible="1" force_save="1"/>
+                <field name="pick_move" invisible="1" force_save="1"/>
+                <field name="out_move" invisible="1" force_save="1"/>
+                <field name="in_move" invisible="1" force_save="1"/>
+                <!--<field name="picking_id" attrs="{'readonly': [('state', '!=', ('draft'))]}" widget="many2many_tags"/>-->
+            </xpath>
+            <xpath expr="//button[@name='button_validate']" position="attributes">
+              <attribute name="invisible">not_validate or state in ('waiting', 'confirmed') or not show_validate</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+              <field name="not_validate" invisible="1" force_save="1"/>
+            </xpath>
+      </field>
+    </record>
+</odoo>

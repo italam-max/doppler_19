@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_almx_manual_out_creator" model="res.groups">
+        <field name="name">Alamex: Crear OUT manual (traslados)</field>
+        <field name="category_id" ref="base.module_category_inventory"/>
+        <field name="comment">
+Usuarios autorizados para ver y usar el botón "Crear OUT" en un traslado
+tipo Recogida (PICK) ya validado. Este botón genera una Orden de entrega
+manual y no debe usarse sin criterio de almacén, por lo que se restringe
+a un grupo específico de personas en vez del grupo genérico de
+Inventario.
+
+La lista de usuarios se busca por correo (login) al instalar/actualizar
+el módulo, para que se restaure sola si el módulo llega a reinstalarse
+(en vez de perderse silenciosamente, como pasó con otra configuración
+similar).
+        </field>
+    </record>
+
+    <function model="res.groups" name="action_almx_assign_manual_out_creators"/>
+</odoo>
