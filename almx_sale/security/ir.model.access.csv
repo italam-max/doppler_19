@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_almx_sale_almx_sale,almx_sale.almx_sale,model_almx_sale_almx_sale,base.group_user,1,1,1,1
