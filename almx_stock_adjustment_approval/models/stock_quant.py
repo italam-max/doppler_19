@@ -7,12 +7,12 @@ import json
 class StockQuant(models.Model):
     _inherit = 'stock.quant'
 
-    def action_apply_inventory(self):
+    def action_apply_inventory(self, *args, **kwargs):
         if self.env.context.get('bypass_adjustment_approval'):
-            return super().action_apply_inventory()
+            return super().action_apply_inventory(*args, **kwargs)
 
         if self.env.user.has_group('almx_stock_adjustment_approval.group_stock_adjustment_approver'):
-            return super().action_apply_inventory()
+            return super().action_apply_inventory(*args, **kwargs)
 
         quants_con_diferencia = self.filtered(
             lambda q: q.inventory_quantity_set and q.inventory_diff_quantity != 0
