@@ -128,19 +128,9 @@
         <xpath expr="//field[@name='origin']" position="after">
           <field name="is_paid" readonly="is_account_manager == False"/>
           <field name="is_account_manager" invisible="1"/>
-          <field name="warehouse_already" force_save="1" readonly="warehouse_check == True"/>
-          <field name="warehouse_date" readonly="1" force_save="1" invisible="warehouse_already == False"/>
-          <field name="store_already" force_save="1" readonly="store_check == True"/>
-          <field name="store_date" readonly="1" force_save="1" invisible="store_already == False"/>
-          <field name="lab_already" force_save="1" readonly="lab_check == True"/>
-          <field name="lab_date" readonly="1" force_save="1" invisible="lab_already == False"/>
-          <field name="quality_already" force_save="1" readonly="quality_check == True"/>
-          <field name="quality_date" readonly="1" force_save="1" invisible="quality_already == False"/>
-
-          <field name="warehouse_check" invisible="1"/>
-          <field name="store_check" invisible="1"/>
-          <field name="lab_check" invisible="1"/>
-          <field name="quality_check" invisible="1"/>
+          <!-- ALMX FIX (sept 2026, port a 19): se quitaron los 12 campos de
+               "Material listo" (warehouse/store/lab/quality: _already, _date,
+               _check); confirmado que no funcionaban de verdad en 16. -->
         </xpath>
         <xpath expr="//field[@name='is_immediate']" position="after">
             <field name="out_complement" invisible="picking_type_id != 37" force_save="1"/>

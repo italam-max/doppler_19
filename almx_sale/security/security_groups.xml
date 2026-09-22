@@ -1,0 +1,19 @@
+<odoo>
+  <data>
+    <!--Grupo "Puede confirmar pago de venta" (sept 2026). Restringe el campo
+        completely_paid ("Venta Pagada") en el pedido de venta: solo estas
+        personas lo pueden ver y editar ahi. El equipo de almacen sigue
+        viendo el estado (via el campo espejo en el OUT, x_studio_completamente_pagado
+        en almx_stock) pero de solo lectura; ese campo relacionado no tiene
+        restriccion de grupo propia, solo hereda que es readonly por defecto.
+        El vendedor no ve el campo en absoluto.
+        Roster confirmado por el usuario (Karina Granados, Silvia Fuentes,
+        Hamdi Alam), asignado por RPC tras instalar en vez de eval aqui:
+        estos usuarios no tienen un xmlid estable para usar ref() en datos
+        XML. Mismo criterio que otros grupos de este proyecto: nace vacio.-->
+    <record id="group_can_confirm_sale_payment" model="res.groups">
+        <field name="name">Puede confirmar pago de venta</field>
+        <field name="comment">Usuarios autorizados para ver y marcar el campo "Venta Pagada" en el pedido de venta. Equipo de Finanzas: Karina Granados, Silvia Fuentes, Hamdi Alam.</field>
+    </record>
+  </data>
+</odoo>

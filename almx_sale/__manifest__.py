@@ -24,11 +24,12 @@
     'version': '19.0.1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','sale','stock'],
+    'depends': ['base','sale','stock','delivery'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
+        'security/security_groups.xml',
         'views/sale_views.xml',
         'views/views.xml',
         'views/templates.xml',

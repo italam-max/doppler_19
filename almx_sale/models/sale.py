@@ -24,7 +24,7 @@ class SaleOrder(models.Model):
                                   ('modern', 'Modernización'),
                                   ('fix', 'Reparación'),],
                                  string='Tipo de venta', help='Muestra el tipo de venta que designa el vendedor', tracking=True)
-    completely_paid = fields.Boolean(string='Venta Pagada', help='Muestra si el equipo de finanzas confirmó el pago de la SO', tracking=True)
+    completely_paid = fields.Boolean(string='Venta Pagada', help='Muestra si el equipo de finanzas confirmó el pago de la SO', tracking=True, groups='almx_sale.group_can_confirm_sale_payment')
 
     @api.onchange('carrier_id')
     def is_immediate_carrier(self):

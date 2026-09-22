@@ -20,18 +20,10 @@ class StockPicking(models.Model):
     is_immediate = fields.Boolean(string='Es entrega inmediata?', help='Muestra si la órden de venta está configurada para entrega inmediata', compute='get_sale_values')
     is_paid = fields.Boolean(string='Pagado', help='Verifica si la orden de venta que generó el movimiento de almacén se encuentra pagada', tracking=True)
     is_account_manager = fields.Boolean(string='Pertenece a contabilidad?', help='Verifica si la orden de venta que generó el movimiento de almacén se encuentra pagada', compute='is_in_group_validation')
-    warehouse_already = fields.Boolean(string='Material en Almacén listo', help='Verifica si el material de almacén está listo')
-    store_already = fields.Boolean(string='Material en Bodega listo', help='Verifica si el material de bodega está listo')
-    lab_already = fields.Boolean(string='Material en Laboratorio listo', help='Verifica si el material de bodega está listo')
-    quality_already = fields.Boolean(string='Material en calidad validado', help='Verifica si el material de calidad está validad')
-    warehouse_date = fields.Datetime(string='Fecha material de almacén', help='Muestra la fecha en que se verificó el material de almacén', tracking=True)
-    store_date = fields.Datetime(string='Fecha material de bodega', help='Muestra la fecha en que se verificó el material de bodega', tracking=True)
-    lab_date = fields.Datetime(string='Fecha material de laboratorio', help='Muestra la fecha en que se verificó el material de laboratorio', tracking=True)
-    quality_date = fields.Datetime(string='Fecha validación calidad', help='Muestra la fecha en que se verificó el material por calidad', tracking=True)
-    warehouse_check = fields.Boolean(string='Is warehouse already?')
-    store_check = fields.Boolean(string='Is store already?')
-    lab_check = fields.Boolean(string='Is lab already?')
-    quality_check = fields.Boolean(string='Is quality already?')
+    # ALMX FIX (sept 2026, port a 19): se quitaron warehouse_already/store_already/
+    # lab_already/quality_already (+ sus _date y _check) -- "Material listo" por
+    # departamento. Confirmado con el usuario que no funcionaban de verdad en 16
+    # (no bloqueaban nada, no se usaban), limpieza acordada explicitamente.
     out_complement = fields.Char(string='OUT complemento', help='Muestra los complementos del OUT')
     partner_receives = fields.Char(string='Persona que recibe')
     not_validate = fields.Boolean(string='No se puede validar', help='Muestra si la condición de pagado aplica para la orden de venta relacionada al movimiento de almacén actual', compute='compute_spare_sale_order')
@@ -129,46 +121,6 @@ class StockPicking(models.Model):
             self.is_account_manager = True
         else:
             self.is_account_manager = False
-
-    @api.depends('warehouse_already')
-    @api.onchange('warehouse_already')
-    def onchange_warehouse_already(self):
-        if self.warehouse_already == True:
-            self.warehouse_date = datetime.now()
-            self.warehouse_check = True
-        else:
-            self.warehouse_date = False
-            self.warehouse_check = False
-
-    @api.depends('store_already')
-    @api.onchange('store_already')
-    def onchange_store_already(self):
-        if self.store_already == True:
-            self.store_date = datetime.now()
-            self.store_check = True
-        else:
-            self.store_date = False
-            self.store_check = False
-
-    @api.depends('lab_already')
-    @api.onchange('lab_already')
-    def onchange_lab_already(self):
-        if self.lab_already == True:
-            self.lab_date = datetime.now()
-            self.lab_check = True
-        else:
-            self.lab_date = False
-            self.lab_check = False
-
-    @api.depends('quality_already')
-    @api.onchange('quality_already')
-    def onchange_lab_already(self):
-        if self.quality_already == True:
-            self.quality_date = datetime.now()
-            self.quality_check = True
-        else:
-            self.quality_date = False
-            self.quality_check = False
 
     def compute_spare_sale_order(self):
         for rec in self:
