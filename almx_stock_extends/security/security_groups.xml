@@ -2,7 +2,6 @@
 <odoo>
     <record id="group_almx_manual_out_creator" model="res.groups">
         <field name="name">Alamex: Crear OUT manual (traslados)</field>
-        <field name="category_id" ref="base.module_category_inventory"/>
         <field name="comment">
 Usuarios autorizados para ver y usar el botón "Crear OUT" en un traslado
 tipo Recogida (PICK) ya validado. Este botón genera una Orden de entrega

@@ -203,7 +203,7 @@ Changelog
     'version': '19.0.1.0.11',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','stock','sale'],
+    'depends': ['base','stock','sale','almx_stock'],
 
     # always loaded
     'data': [

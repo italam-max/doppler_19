@@ -2,7 +2,7 @@
 import base64
 from odoo import api, fields, models, SUPERUSER_ID
 from odoo import models, fields, api, _
-from odoo.exceptions import Warning, ValidationError, UserError
+from odoo.exceptions import ValidationError, UserError
 from datetime import date
 from datetime import datetime
 from io import StringIO, BytesIO
@@ -14,7 +14,6 @@ import requests
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    not_validate = fields.Boolean(string='No se puede validar', help='Muestra si la condición de pagado aplica para la orden de venta relacionada al movimiento de almacén actual', compute='compute_spare_sale_order')
     detect_move_type = fields.Boolean(string='Tipo de movimiento', compute='compute_picking_type_move')
     pick_move = fields.Boolean(string='Es un PICK')
     out_move = fields.Boolean(string='Es un OUT')
@@ -39,14 +38,11 @@ class StockPicking(models.Model):
             else:
                 rec.detect_move_type = False
 
-    def compute_spare_sale_order(self):
-        op_type = self.picking_type_id.id
-        sale_type = self.x_studio_tipo_de_venta
-        comp_paid = self.x_studio_completamente_pagado
-        if sale_type == 'spare' and comp_paid != True and op_type == 2: #Aplica solo para movimientos que son OUT
-            self.not_validate = True
-        else:
-            self.not_validate = False
+    # NOTA (sept 2026): not_validate / compute_spare_sale_order se quitaron de
+    # este modulo -- vivian duplicados aqui y en almx_stock con logica distinta
+    # (almx_stock usa el op_type correcto para OUT; este usaba uno equivocado
+    # y nunca se ejecutaba en produccion por la colision de nombres). Se
+    # consolido esa regla de negocio unicamente en almx_stock.
 
     # ------------------------------------------------------------------
     # ALMX FIX (blindaje enlace PICK/OUT manual, ago 2026):
@@ -91,8 +87,8 @@ class StockPicking(models.Model):
         if not pick_picking.origin or pick_picking.origin != out_picking.origin:
             return
 
-        pick_moves = pick_picking.move_ids_without_package
-        out_moves = out_picking.move_ids_without_package
+        pick_moves = pick_picking.move_ids
+        out_moves = out_picking.move_ids
 
         if any(isinstance(m.id, models.NewId) for m in pick_moves | out_moves):
             return
@@ -260,7 +256,7 @@ class StockPicking(models.Model):
         # lista porque ese sí es el campo que el formulario realmente
         # escribe cuando el usuario guarda a mano -- y para ese caso ya
         # existe el guard de NewId arriba como red de seguridad adicional.
-        trigger_fields = {'related_pick_id', 'related_out_id', 'move_ids_without_package'}
+        trigger_fields = {'related_pick_id', 'related_out_id', 'move_ids'}
         if trigger_fields & set(vals.keys()):
             self._almx_autolink_related_moves()
         return res
@@ -315,7 +311,7 @@ class StockPicking(models.Model):
             self.related_out_id = picking_out.id
 
             # Crear los movimientos
-            for move in self.move_ids_without_package:
+            for move in self.move_ids:
                 new_move = self.env['stock.move'].create({
                     'name': move.name,
                     'product_id': move.product_id.id,
@@ -381,7 +377,7 @@ class StockPicking(models.Model):
             self.related_out_id = picking_out.id
 
             # Crear los movimientos
-            for move in self.move_ids_without_package:
+            for move in self.move_ids:
                 new_move = self.env['stock.move'].create({
                     'name': move.name,
                     'product_id': move.product_id.id,

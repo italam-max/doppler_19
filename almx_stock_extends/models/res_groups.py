@@ -32,4 +32,4 @@ class ResGroups(models.Model):
             'cesar.m@alam.mx',
         ]
         users = self.env['res.users'].search([('login', 'in', logins)])
-        group.write({'users': [(6, 0, users.ids)]})
+        group.write({'user_ids': [(6, 0, users.ids)]})

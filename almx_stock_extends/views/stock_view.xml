@@ -44,7 +44,7 @@
                     <field name="return_count" widget="statinfo" string="Devoluciones"/>
                 </button>
             </xpath>
-            <xpath expr="//field[@name='move_ids_without_package']//field[@name='quantity']" position="after">
+            <xpath expr="//field[@name='move_ids']//field[@name='quantity']" position="after">
                 <field name="returned_qty" string="Devuelto" optional="show"/>
             </xpath>
           <xpath expr="//field[@name='partner_id']" position="after">
@@ -56,12 +56,9 @@
                 <field name="in_move" invisible="1" force_save="1"/>
                 <!--<field name="picking_id" attrs="{'readonly': [('state', '!=', ('draft'))]}" widget="many2many_tags"/>-->
             </xpath>
-            <xpath expr="//button[@name='button_validate']" position="attributes">
-              <attribute name="invisible">not_validate or state in ('waiting', 'confirmed') or not show_validate</attribute>
-            </xpath>
-            <xpath expr="//field[@name='partner_id']" position="after">
-              <field name="not_validate" invisible="1" force_save="1"/>
-            </xpath>
+            <!-- NOTA (sept 2026): las modificaciones a button_validate (invisible
+                 con not_validate) se movieron a almx_stock; vivian duplicadas
+                 aqui con una version incompleta (solo protegia el boton 1, no el 2). -->
       </field>
     </record>
 </odoo>

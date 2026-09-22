@@ -19,7 +19,6 @@
             <field name="code">model._cron_almx_autolink_related_ids()</field>
             <field name="interval_number">10</field>
             <field name="interval_type">minutes</field>
-            <field name="numbercall">-1</field>
             <field name="active">True</field>
         </record>
     </data>
