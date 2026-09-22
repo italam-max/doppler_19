@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Wizard: Solicitar Aprobación (captura motivo) -->
+        <record id="view_stock_adjustment_request_wizard_form" model="ir.ui.view">
+            <field name="name">stock.adjustment.request.wizard.form</field>
+            <field name="model">stock.adjustment.request.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Solicitar Aprobación de Ajuste de Inventario">
+                    <sheet>
+                        <div class="alert alert-info">
+                            <strong>ℹ️ Aprobación requerida:</strong>
+                            No puedes aplicar ajustes de inventario directamente.
+                            Ingresa el motivo y envía la solicitud a <strong>Hamdi Alam</strong>
+                            para su revisión y aprobación.
+                        </div>
+
+                        <group string="Vista Previa del Ajuste">
+                            <field name="adjustment_preview" widget="html" nolabel="1"/>
+                        </group>
+
+                        <group string="Justificación">
+                            <field name="reason"
+                                   widget="text"
+                                   nolabel="1"
+                                   placeholder="Describe el motivo del ajuste de inventario: ¿qué detectaste?, ¿dónde?, ¿cuál es la causa probable?..."
+                                   required="1"/>
+                        </group>
+
+                        <field name="quant_ids_context" invisible="1"/>
+                    </sheet>
+                    <footer>
+                        <button name="action_submit"
+                                string="📤 Enviar Solicitud"
+                                type="object"
+                                class="btn-primary"/>
+                        <button string="Cancelar"
+                                class="btn-secondary"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Wizard: Rechazar (captura motivo de rechazo) -->
+        <record id="view_stock_adjustment_reject_wizard_form" model="ir.ui.view">
+            <field name="name">stock.adjustment.reject.wizard.form</field>
+            <field name="model">stock.adjustment.reject.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Rechazar Solicitud de Ajuste">
+                    <sheet>
+                        <div class="alert alert-danger">
+                            <strong>⚠️ Al rechazar</strong>, el solicitante recibirá una
+                            notificación con el motivo. El ajuste de inventario
+                            <strong>NO</strong> será aplicado.
+                        </div>
+                        <group>
+                            <field name="request_id" readonly="1"/>
+                            <field name="rejection_reason"
+                                   widget="text"
+                                   string="Motivo del Rechazo"
+                                   placeholder="Explica por qué se rechaza este ajuste..."
+                                   required="1"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_confirm_reject"
+                                string="❌ Confirmar Rechazo"
+                                type="object"
+                                class="btn-danger"/>
+                        <button string="Cancelar"
+                                class="btn-secondary"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

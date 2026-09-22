@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Vista Lista -->
+        <record id="view_stock_adjustment_request_tree" model="ir.ui.view">
+            <field name="name">stock.adjustment.request.tree</field>
+            <field name="model">stock.adjustment.request</field>
+            <field name="arch" type="xml">
+                <list string="Solicitudes de Ajuste"
+                      decoration-warning="state == 'pending'"
+                      decoration-success="state == 'approved'"
+                      decoration-danger="state == 'rejected'"
+                      decoration-muted="state == 'cancelled'">
+                    <field name="name"/>
+                    <field name="create_date" string="Fecha"/>
+                    <field name="requester_id"/>
+                    <field name="reason" optional="show"/>
+                    <field name="state"
+                           widget="badge"
+                           decoration-warning="state == 'pending'"
+                           decoration-success="state == 'approved'"
+                           decoration-danger="state == 'rejected'"/>
+                    <field name="approver_id" optional="show"/>
+                    <field name="date_resolved" optional="show"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Vista Formulario -->
+        <record id="view_stock_adjustment_request_form" model="ir.ui.view">
+            <field name="name">stock.adjustment.request.form</field>
+            <field name="model">stock.adjustment.request</field>
+            <field name="arch" type="xml">
+                <form string="Solicitud de Ajuste de Inventario">
+                    <header>
+                        <button name="action_approve"
+                                string="✅ Aprobar y Aplicar"
+                                type="object"
+                                class="btn-success"
+                                invisible="state != 'pending'"
+                                groups="almx_stock_adjustment_approval.group_stock_adjustment_approver"
+                                confirm="¿Confirmas que deseas aprobar y aplicar este ajuste de inventario?"/>
+                        <button name="action_reject"
+                                string="❌ Rechazar"
+                                type="object"
+                                class="btn-danger"
+                                invisible="state != 'pending'"
+                                groups="almx_stock_adjustment_approval.group_stock_adjustment_approver"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="pending,approved,rejected"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+
+                        <!-- Alerta para aprobador cuando hay solicitud pendiente -->
+                        <div class="alert alert-warning"
+                             invisible="state != 'pending'"
+                             groups="almx_stock_adjustment_approval.group_stock_adjustment_approver">
+                            <strong>⚠️ Acción requerida:</strong>
+                            Revisa el detalle del ajuste y el motivo antes de aprobar o rechazar.
+                        </div>
+
+                        <!-- Info de rechazo -->
+                        <div class="alert alert-danger"
+                             invisible="state != 'rejected'">
+                            <strong>❌ Solicitud Rechazada</strong>
+                            <br/>
+                            <field name="rejection_reason" readonly="1"/>
+                        </div>
+
+                        <group>
+                            <group string="Información de la Solicitud">
+                                <field name="requester_id" readonly="1"/>
+                                <field name="date_request" readonly="1"/>
+                                <field name="reason" readonly="1" widget="text"/>
+                            </group>
+                            <group string="Resolución">
+                                <field name="approver_id" readonly="1"/>
+                                <field name="date_resolved" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Detalle del Ajuste">
+                                <field name="adjustment_lines_display" readonly="1" widget="html"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista Búsqueda -->
+        <record id="view_stock_adjustment_request_search" model="ir.ui.view">
+            <field name="name">stock.adjustment.request.search</field>
+            <field name="model">stock.adjustment.request</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Solicitudes">
+                    <field name="name" string="Referencia"/>
+                    <field name="requester_id" string="Solicitante"/>
+                    <field name="reason" string="Motivo"/>
+                    <separator/>
+                    <filter name="pending" string="Pendientes" domain="[('state','=','pending')]"/>
+                    <filter name="approved" string="Aprobados" domain="[('state','=','approved')]"/>
+                    <filter name="rejected" string="Rechazados" domain="[('state','=','rejected')]"/>
+                    <separator/>
+                    <filter name="my_requests" string="Mis Solicitudes"
+                            domain="[('requester_id','=',uid)]"/>
+                    <group expand="0" string="Agrupar Por">
+                        <filter name="group_requester" string="Solicitante"
+                                context="{'group_by': 'requester_id'}"/>
+                        <filter name="group_state" string="Estado"
+                                context="{'group_by': 'state'}"/>
+                        <filter name="group_month" string="Mes"
+                                context="{'group_by': 'create_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Acción de ventana -->
+        <record id="action_stock_adjustment_request" model="ir.actions.act_window">
+            <field name="name">Solicitudes de Ajuste de Inventario</field>
+            <field name="res_model">stock.adjustment.request</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_stock_adjustment_request_search"/>
+            <field name="context">{'search_default_pending': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No hay solicitudes de ajuste de inventario
+                </p>
+                <p>
+                    Las solicitudes aparecen aquí cuando un usuario intenta
+                    aplicar un ajuste de inventario y requiere aprobación.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

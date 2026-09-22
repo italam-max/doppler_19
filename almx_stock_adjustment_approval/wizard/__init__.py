@@ -1,0 +1,3 @@
+# -*- coding: utf-8 -*-
+from . import stock_adjustment_request_wizard
+from . import stock_adjustment_reject_wizard

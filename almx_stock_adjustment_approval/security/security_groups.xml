@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!--
+            GRUPO APROBADOR
+            Miembros: pueden aplicar ajustes directamente Y aprobar/rechazar solicitudes.
+            Agregar aquí a Hamdi (y a quien se desee en el futuro).
+            Desde: Ajustes > Usuarios > (usuario) > sección permisos
+        -->
+        <record id="group_stock_adjustment_approver" model="res.groups">
+            <field name="name">Aprobador de Ajustes de Inventario</field>
+            <field name="comment">
+                Los miembros pueden aplicar ajustes de inventario directamente
+                y tienen acceso al menú de Solicitudes para aprobar o rechazar.
+                Agregar aquí a Hamdi Alam y a cualquier otro aprobador futuro.
+            </field>
+            <field name="user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Secuencia para numeración de solicitudes -->
+        <record id="seq_stock_adjustment_request" model="ir.sequence">
+            <field name="name">Solicitud de Ajuste de Inventario</field>
+            <field name="code">stock.adjustment.request</field>
+            <field name="prefix">AJU/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

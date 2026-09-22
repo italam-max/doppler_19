@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_stock_adjustment_request_user,stock.adjustment.request user,model_stock_adjustment_request,base.group_user,1,1,1,0
+access_stock_adjustment_request_approver,stock.adjustment.request approver,model_stock_adjustment_request,almx_stock_adjustment_approval.group_stock_adjustment_approver,1,1,1,1
+access_stock_adjustment_request_wizard_user,stock.adjustment.request.wizard user,model_stock_adjustment_request_wizard,base.group_user,1,1,1,1
+access_stock_adjustment_reject_wizard_approver,stock.adjustment.reject.wizard approver,model_stock_adjustment_reject_wizard,almx_stock_adjustment_approval.group_stock_adjustment_approver,1,1,1,1

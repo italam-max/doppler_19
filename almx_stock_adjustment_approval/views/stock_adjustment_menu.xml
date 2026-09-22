@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--
+            Menú: Inventario > Operaciones > Solicitudes de Ajuste
+            Visible para todos (pueden ver sus propias solicitudes)
+            Solo el aprobador puede Aprobar/Rechazar desde el formulario
+        -->
+        <menuitem
+            id="menu_stock_adjustment_request"
+            name="Solicitudes de Ajuste"
+            parent="stock.menu_stock_warehouse_mgmt"
+            action="almx_stock_adjustment_approval.action_stock_adjustment_request"
+            sequence="25"/>
+
+    </data>
+</odoo>
