@@ -30,11 +30,23 @@ class StockPicking(models.Model):
     # ALMX FIX (19.0 compat, sept 2026): x_studio_tipo_de_venta y
     # x_studio_completamente_pagado eran campos de Studio en 16 (nunca definidos
     # en codigo por ningun modulo) que no sobrevivieron el upgrade de base de
-    # datos a 19. Se recrean aqui como campos propios del modulo, relacionados
-    # directo a sale_id (consolidado con not_validate/compute_spare_sale_order,
-    # que es lo unico que los usa).
+    # datos a 19. Se recrean aqui como campos propios del modulo, consolidado
+    # con not_validate/compute_spare_sale_order, que es lo unico que los usa.
     x_studio_tipo_de_venta = fields.Selection(related='sale_id.sale_type', string='Tipo de venta', store=True)
-    x_studio_completamente_pagado = fields.Boolean(related='sale_id.completely_paid', string='Completamente pagado', store=True)
+    # x_studio_completamente_pagado: NO es related directo (a diferencia de
+    # arriba) porque completely_paid en sale.order esta restringido al grupo
+    # de Finanzas (almx_sale.group_can_confirm_sale_payment). Un related
+    # normal hereda esa restriccion al intentar leer el campo origen, y
+    # Almacen dejaria de poder consultar el estado de pago en el OUT (que es
+    # justo lo que se pidio que SI pudieran hacer, solo sin editar). Con un
+    # compute + sudo() se lee el valor saltandose esa restriccion puntual,
+    # y el campo se queda de solo lectura para todos por no tener inverse.
+    x_studio_completamente_pagado = fields.Boolean(string='Completamente pagado', compute='_compute_completamente_pagado', store=True)
+
+    @api.depends('sale_id.completely_paid')
+    def _compute_completamente_pagado(self):
+        for rec in self:
+            rec.x_studio_completamente_pagado = rec.sudo().sale_id.completely_paid
     show_request_authorization = fields.Boolean(
         string='Mostrar botón de solicitar autorización',
         compute='_compute_show_request_authorization',
