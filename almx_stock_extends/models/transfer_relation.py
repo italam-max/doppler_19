@@ -28,11 +28,14 @@ class SaleOrder(models.Model):
         # mano por el usuario en el propio traslado. Este compute se deja
         # solo como indicador informativo (is_related), sin efectos
         # secundarios sobre otros registros.
+        # ALMX FIX (19.0 compat, sept 2026): procurement_group_id se eliminó
+        # por completo de sale.order en Odoo 19 (cambio nativo). Como este
+        # compute es puramente informativo (ver nota arriba), se cambia a
+        # buscar pickings por el campo nativo sale_id de stock.picking, que
+        # apunta directo al pedido de venta -- mas simple y directo que la
+        # cadena de group_id/procurement_group_id que usaba antes.
         for order in self:
-            if not order.procurement_group_id:
-                order.is_related = False
-                continue
-            pickings = self.env['stock.picking'].search([('group_id', '=', order.procurement_group_id.id)])
+            pickings = self.env['stock.picking'].search([('sale_id', '=', order.id)])
             auto_picks = pickings.filtered(lambda p: p.picking_type_id.sequence_code == 'NWH/PICK/')
             auto_outs = pickings.filtered(lambda p: p.picking_type_id.sequence_code == 'NWH/OUT/')
             order.is_related = bool(auto_picks and auto_outs)
