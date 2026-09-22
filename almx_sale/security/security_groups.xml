@@ -15,5 +15,13 @@
         <field name="name">Puede confirmar pago de venta</field>
         <field name="comment">Usuarios autorizados para ver y marcar el campo "Venta Pagada" en el pedido de venta. Equipo de Finanzas: Karina Granados, Silvia Fuentes, Hamdi Alam.</field>
     </record>
+    <!--Grupo "Administrador de pedidos de venta (TI)" (sept 2026). Unicos que
+        pueden cancelar o eliminar pedidos de venta, y cambiar el Tipo de venta
+        de un pedido ya confirmado. Roster confirmado por el usuario: Sammer,
+        Hamdi Alam, Celia Hernandez, Alexis Enriquez; se asigna por RPC.-->
+    <record id="group_so_admin" model="res.groups">
+        <field name="name">Administrador de pedidos de venta (TI)</field>
+        <field name="comment">Puede cancelar y eliminar pedidos de venta, y modificar el Tipo de venta de pedidos confirmados.</field>
+    </record>
   </data>
 </odoo>

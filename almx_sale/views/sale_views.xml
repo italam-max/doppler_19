@@ -10,7 +10,8 @@
                 <field name="carrier_id" readonly="state != 'draft'" required="state == 'draft'"/>
                 <field name="is_immediate" invisible="1"/>
                 <field name="collect_date" invisible="not is_immediate" required="state == 'draft' and is_immediate" />
-                <field name="sale_type" widget="radio"/>
+                <field name="is_so_admin" invisible="1"/>
+                <field name="sale_type" widget="radio" readonly="state == 'sale' and not is_so_admin"/>
                 <field name="completely_paid"/>
           </xpath>
       </field>

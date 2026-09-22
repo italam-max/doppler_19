@@ -2,6 +2,7 @@
 import base64
 from odoo import _, api, fields, models
 from odoo import api, SUPERUSER_ID
+from odoo.exceptions import UserError
 from datetime import datetime
 from pytz import timezone
 import logging
@@ -25,6 +26,42 @@ class SaleOrder(models.Model):
                                   ('fix', 'Reparación'),],
                                  string='Tipo de venta', help='Muestra el tipo de venta que designa el vendedor', tracking=True)
     completely_paid = fields.Boolean(string='Venta Pagada', help='Muestra si el equipo de finanzas confirmó el pago de la SO', tracking=True, groups='almx_sale.group_can_confirm_sale_payment')
+    # ALMX (sept 2026): usuarios de TI/Direccion (almx_sale.group_so_admin) son
+    # los unicos que pueden cancelar o eliminar pedidos de venta, y los unicos
+    # que pueden cambiar el Tipo de venta una vez confirmado el pedido.
+    is_so_admin = fields.Boolean(string='Es administrador de ventas', compute='_compute_is_so_admin')
+
+    @api.depends_context('uid')
+    def _compute_is_so_admin(self):
+        is_admin = self.env.user.has_group('almx_sale.group_so_admin')
+        for rec in self:
+            rec.is_so_admin = is_admin
+
+    def _almx_is_so_admin(self):
+        return self.env.su or self.env.user.has_group('almx_sale.group_so_admin')
+
+    def write(self, vals):
+        if 'sale_type' in vals and not self._almx_is_so_admin():
+            locked = self.filtered(lambda o: o.state == 'sale' and o.sale_type != vals['sale_type'])
+            if locked:
+                raise UserError(_("El Tipo de venta no se puede modificar una vez confirmado el pedido (%s). "
+                                  "Solicítalo al área de TI.") % ', '.join(locked.mapped('name')))
+        return super().write(vals)
+
+    def action_cancel(self):
+        if not self._almx_is_so_admin():
+            raise UserError(_("Solo el área de TI puede cancelar pedidos de venta."))
+        return super().action_cancel()
+
+    def _action_cancel(self):
+        if not self._almx_is_so_admin():
+            raise UserError(_("Solo el área de TI puede cancelar pedidos de venta."))
+        return super()._action_cancel()
+
+    def unlink(self):
+        if not self._almx_is_so_admin():
+            raise UserError(_("Solo el área de TI puede eliminar pedidos de venta."))
+        return super().unlink()
 
     @api.onchange('carrier_id')
     def is_immediate_carrier(self):
