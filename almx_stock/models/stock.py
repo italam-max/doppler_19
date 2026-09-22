@@ -46,9 +46,9 @@ class StockPicking(models.Model):
     show_request_authorization = fields.Boolean(
         string='Mostrar botón de solicitar autorización',
         compute='_compute_show_request_authorization',
-        help='True si el usuario actual NO pertenece a ninguno de los grupos autorizados '
-             'para validar pickings (doppler.group_can_validate_picking_alamex o '
-             'doppler.group_can_validate_picking_doppler) y el picking es una salida (outgoing). '
+        help='True si el usuario actual NO pertenece al grupo autorizado '
+             'para validar pickings (almx_stock.group_can_validate_picking_doppler, NWH) '
+             'y el picking es una salida (outgoing). '
              'Controla la visibilidad del botón "Solicitar autorización" en la vista.'
     )
     #PC Fields
@@ -181,17 +181,19 @@ class StockPicking(models.Model):
                 rec.not_validate = False
 
     def _get_authorized_validators(self):
-        """ Usuarios que hoy pueden validar pickings (grupos de Alamex + Doppler).
+        """ Usuarios que hoy pueden validar pickings (grupo de Doppler/NWH).
         Se usa SOLO para decidir si mostrar el botón "Solicitar autorización"
-        (se muestra a quien NO esté aquí). No es la lista de a quién se notifica
-        -- ver _get_authorization_notify_recipients para eso. """
-        alamex_group = self.env.ref('doppler.group_can_validate_picking_alamex', raise_if_not_found=False)
-        doppler_group = self.env.ref('doppler.group_can_validate_picking_doppler', raise_if_not_found=False)
+        (se muestra a quien NO esté aquí). No es la lista de a quién se notifica;
+        ver _get_authorization_notify_recipients para eso.
+
+        ALMX FIX (sept 2026, port a 19): antes tambien se consultaba
+        doppler.group_can_validate_picking_alamex (almacen WH/Alamex). Se dejo
+        de usar ese almacen, asi que ese grupo no se recreo al portar a 19
+        (decision de negocio, no un pendiente tecnico). """
+        doppler_group = self.env.ref('almx_stock.group_can_validate_picking_doppler', raise_if_not_found=False)
         validators = self.env['res.users']
-        if alamex_group:
-            validators |= alamex_group.users
         if doppler_group:
-            validators |= doppler_group.users
+            validators |= doppler_group.user_ids
         return validators
 
     def _get_authorization_notify_recipients(self):

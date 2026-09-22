@@ -1,5 +1,19 @@
 <odoo>
   <data>
+    <!--Grupo "Puede validar pickings (NWH)". ALMX FIX (sept 2026, port a 19):
+        antes se referenciaba como doppler.group_can_validate_picking_doppler
+        (modulo doppler, no portado a 19). Se recrea aqui, propio de almx_stock,
+        SOLO el grupo de NWH que es el que realmente se usa hoy (Doppler
+        Elevadores). El de Alamex/WH (doppler.group_can_validate_picking_alamex)
+        NO se recreo; ya no se usa ese almacen, y el codigo Python que lo
+        consulta ya lo tolera (raise_if_not_found=False). Mismo criterio que
+        no_validate_manual_picking arriba: nace vacio, sin eval de "users", se
+        asigna manualmente desde Ajustes > Usuarios por un administrador.-->
+    <record id="group_can_validate_picking_doppler" model="res.groups">
+        <field name="name">Puede validar pickings (NWH)</field>
+        <field name="comment">Usuarios autorizados para validar Picks/OUTs del almacen NWH (Doppler Elevadores). Controla el boton "Validar" en el formulario del picking.</field>
+    </record>
+
     <!--Grupo para la validación manual de inventario.
         IMPORTANTE: este registro se creó manualmente en producción (2026-07) porque
         el código de button_validate() lo esperaba desde hace tiempo pero el grupo
@@ -15,19 +29,19 @@
     </record>
 
     <!--Grupo de destinatarios de "Solicitar autorización". Independiente de quién
-        PUEDE validar (doppler.group_can_validate_picking_alamex/doppler), ya que este
+        PUEDE validar (almx_stock.group_can_validate_picking_doppler), ya que este
         grupo define solo a quién le llega el aviso cuando alguien pide autorización,
         ya que en la práctica no todos los que pueden validar deben recibir cada aviso
         (ej. administradores que sí pueden validar pero no dan seguimiento operativo diario).-->
     <record id="group_picking_authorization_notify" model="res.groups">
         <field name="name">Recibe solicitudes de autorización de PICK</field>
-        <field name="comment">Usuarios que reciben la notificación cuando alguien usa el botón "Solicitar autorización" en un picking. No implica que puedan o no validar -- eso lo controlan los grupos de Alamex/Doppler por separado.</field>
+        <field name="comment">Usuarios que reciben la notificación cuando alguien usa el botón "Solicitar autorización" en un picking. No implica que puedan o no validar -- eso lo controla el grupo de Doppler (NWH) por separado.</field>
     </record>
 
     <!--Grupos de acceso para acceso completo y acceso parcial-->
     <record id="view_datos_partner_complete" model="res.groups">
         <field name="name">Acceso completo a información del Contacto (inventario)</field>
-        <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        <field name="user_ids" eval="[(4, ref('base.user_root'))]"/>
     </record>
     <record id="access_complete" model="ir.model.access">
         <field name="name">Acceso completo a información del Contacto (inventario)</field>
@@ -41,7 +55,7 @@
 
     <record id="view_datos_partner_partial" model="res.groups">
         <field name="name">Acceso parcial a información del Contacto (inventario)</field>
-        <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        <field name="user_ids" eval="[(4, ref('base.user_root'))]"/>
     </record>
 
     <record id="access_partial" model="ir.model.access">
@@ -161,7 +175,7 @@
              conflicto con un context nativo de Odoo que referencia partner_id en la vista de líneas
              de movimiento, lo cual rompía la validación del módulo al hacer -u. -->
         <xpath expr="//button[@name='button_validate'][@class='oe_highlight']" position="attributes">
-          <attribute name="groups">doppler.group_can_validate_picking_doppler</attribute>
+          <attribute name="groups">almx_stock.group_can_validate_picking_doppler</attribute>
             <attribute name="invisible">state in ('draft', 'confirmed', 'done', 'cancel') or not_validate</attribute>
           <!--<attribute name="invisible">[('is_paid', '=', False), ('x_studio_tipo_de_venta', '!=', 'spare')]</attribute>-->
         </xpath>
@@ -179,7 +193,7 @@
              podia validarse sin pasar por not_validate). Se consolido y
              completo la regla en almx_stock, unica fuente de esta logica. -->
         <xpath expr="//button[@name='button_validate'][2]" position="attributes">
-          <attribute name="groups">doppler.group_can_validate_picking_doppler</attribute>
+          <attribute name="groups">almx_stock.group_can_validate_picking_doppler</attribute>
           <attribute name="invisible">state in ('waiting', 'assigned', 'done', 'cancel') or not_validate</attribute>
         </xpath>
         <xpath expr="//button[@name='button_validate']" position="after">
