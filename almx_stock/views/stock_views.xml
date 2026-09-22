@@ -126,7 +126,12 @@
           <field name="is_immediate" invisible="1"/>
         </xpath>
         <xpath expr="//field[@name='origin']" position="after">
-          <field name="is_paid" readonly="is_account_manager == False"/>
+          <!-- ALMX (sept 2026, port a 19): se reemplaza is_paid (checkbox manual,
+               no conectado a la SO) por los espejos de solo lectura de la SO.
+               En 16 estos dos campos se mostraban via una vista de Studio que no
+               sobrevivio la migracion. Venta pagada solo la edita Finanzas en la SO. -->
+          <field name="x_studio_tipo_de_venta" readonly="1"/>
+          <field name="x_studio_completamente_pagado" string="Venta pagada" readonly="1"/>
           <field name="is_account_manager" invisible="1"/>
           <!-- ALMX FIX (sept 2026, port a 19): se quitaron los 12 campos de
                "Material listo" (warehouse/store/lab/quality: _already, _date,
