@@ -1,6 +1,6 @@
 {
     'name': 'ALMX - Candados de Movimientos de Inventario',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'summary': 'Todo movimiento con documento: SO en PICK/OUT, PO o devolución en IN, '
                'Dirección para Merma/Laboratorio/Desecho, asignaciones solo TI/RH',
     'description': """
@@ -26,8 +26,21 @@
            equipo): solo los usa el grupo de Asignación (TI y RH) y solo hacia
            ubicaciones marcadas como "Ubicación de asignación". Sin aprobación.
 
+        6. Congelado de contenido (tipos con "Congelar contenido", pensado
+           para OUT): una vez confirmado no se agregan/quitan líneas, ni se
+           cambia producto o cantidad pedida, ni se entrega más de lo pedido
+           (entregar menos sí: backorder por falta de stock). La SO
+           confirmada también queda congelada para artículos de inventario.
+           Si el pedido está mal: cancelar la SO y hacer otra. El PICK sigue
+           abierto (Laboratorio agrega material de controles, como en 16).
+
         Sustituye a los prototipos de 16 almx_delivery_sale_guard y
-        almx_internal_transfer_guard (nunca llegaron a producción).
+        almx_internal_transfer_guard (nunca llegaron a producción) y a
+        stock_freeze_lines de 16 (que solo congelaba agregar/borrar líneas en OUT).
+
+        Changelog
+        - 19.0.1.1.0: congelado de contenido en OUT y SO confirmada.
+        - 19.0.1.0.0: versión inicial.
     """,
     'author': 'Irving Sammer González Correa - Alamex',
     'category': 'Inventory/Inventory',

@@ -9,6 +9,7 @@
                 <field name="almx_require_sale_order"/>
                 <field name="almx_guard_receipts"/>
                 <field name="almx_asset_assignment"/>
+                <field name="almx_freeze_lines"/>
             </field>
         </field>
     </record>

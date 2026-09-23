@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Edición rápida de variante: en 19 el precio se bloquea si la plantilla tiene
+         más de una variante (porque nativo escribe en la plantilla). Con el precio
+         independiente por variante ya se puede editar. -->
+    <record id="product_variant_easy_edit_view_almx_price" model="ir.ui.view">
+        <field name="name">product.product.easy.edit.almx.price</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+        <field name="arch" type="xml">
+            <field name="lst_price" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </field>
+            <field name="lst_price" position="after">
+                <field name="variant_price" invisible="1"/>
+                <div class="text-muted small" invisible="variant_price">Usando el precio base del producto</div>
+            </field>
+        </field>
+    </record>
+
+    <record id="product_normal_form_view_almx_price" model="ir.ui.view">
+        <field name="name">product.product.form.almx.price</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <field name="lst_price" position="after">
+                <field name="variant_price" invisible="1"/>
+            </field>
+        </field>
+    </record>
+</odoo>

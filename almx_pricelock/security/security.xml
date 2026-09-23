@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_edit_sale_price" model="res.groups">
+        <field name="name">Editar precio de venta</field>
+        <field name="comment">Pueden modificar el precio de venta de productos y variantes. Todo cambio queda registrado.</field>
+    </record>
+</odoo>

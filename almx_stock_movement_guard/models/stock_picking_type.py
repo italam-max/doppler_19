@@ -20,3 +20,9 @@ class StockPickingType(models.Model):
         help='Solo el grupo Asignación de equipo (TI / RH) puede validar este tipo, y '
              'solo hacia ubicaciones marcadas como Ubicación de asignación.',
     )
+    almx_freeze_lines = fields.Boolean(
+        string='Congelar contenido (solo lo del pedido)',
+        help='Una vez confirmado el traslado no se pueden agregar ni borrar líneas, '
+             'cambiar producto ni cantidad pedida, ni validar más de lo pedido. Si el '
+             'pedido está mal, se cancela la SO y se hace otra. Pensado para OUT.',
+    )
