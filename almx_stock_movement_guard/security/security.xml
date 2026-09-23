@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="group_direccion" model="res.groups">
+            <field name="name">Dirección (autoriza movimientos de inventario)</field>
+            <field name="comment">
+                Únicos usuarios que pueden validar traslados hacia Merma, Laboratorio
+                o Desecho, recepciones sin Orden de compra ni devolución, y usar el
+                botón Desechar. Validar equivale a autorizar.
+            </field>
+        </record>
+        <record id="group_asset_assignment" model="res.groups">
+            <field name="name">Asignación de equipo (TI / RH)</field>
+            <field name="comment">
+                Pueden crear y validar traslados de los tipos de operación marcados
+                como Asignación de equipo (EPP, celulares, equipo de cómputo).
+            </field>
+        </record>
+    </data>
+</odoo>

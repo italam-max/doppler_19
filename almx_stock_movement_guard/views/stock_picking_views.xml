@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_almx_guard" model="ir.ui.view">
+        <field name="name">stock.picking.form.almx.guard</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <!-- Pedido de venta sube al encabezado, en lugar de Documento origen -->
+            <xpath expr="//field[@name='origin']" position="before">
+                <xpath expr="//field[@name='sale_id']" position="move"/>
+                <field name="purchase_id" readonly="1" invisible="picking_type_code != 'incoming' or not purchase_id"/>
+                <field name="almx_require_sale_order" invisible="1"/>
+                <field name="almx_is_direccion" invisible="1"/>
+                <field name="almx_direction_reason" readonly="1" invisible="not almx_direction_reason"
+                       decoration-warning="1"/>
+            </xpath>
+            <xpath expr="//field[@name='sale_id']" position="attributes">
+                <attribute name="required">almx_require_sale_order and state not in ('done', 'cancel')</attribute>
+                <attribute name="invisible">picking_type_code == 'incoming' and not sale_id</attribute>
+                <attribute name="readonly">state in ('done', 'cancel')</attribute>
+                <attribute name="domain">[('state', '=', 'sale'), ('company_id', 'in', [company_id, False])]</attribute>
+                <attribute name="options">{'no_create': True}</attribute>
+            </xpath>
+            <!-- Documento origen baja a Información adicional; con SO obligatoria se llena solo -->
+            <xpath expr="//group[@name='other_infos']/field[@name='move_type']" position="before">
+                <xpath expr="//field[@name='origin']" position="move"/>
+            </xpath>
+            <xpath expr="//field[@name='origin']" position="attributes">
+                <attribute name="readonly">almx_require_sale_order or state in ('cancel', 'done')</attribute>
+                <attribute name="force_save">1</attribute>
+            </xpath>
+            <!-- Botón para avisar a Dirección -->
+            <xpath expr="//header/button[@name='button_validate']" position="before">
+                <button name="action_almx_request_direction" type="object" string="Solicitar autorización"
+                        class="btn-secondary"
+                        invisible="not almx_direction_reason or almx_is_direccion or state in ('done', 'cancel', 'draft')"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
