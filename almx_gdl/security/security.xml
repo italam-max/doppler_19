@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_acceso_multialmacen_gdl" model="res.groups">
+        <field name="name">Acceso Multi-Almacén GDL</field>
+        <field name="comment">Pueden elegir el Almacén de Retirada (Almacén 2, Almacén 3 o GDL) y las rutas en las líneas de venta.</field>
+    </record>
+</odoo>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Lista de líneas de venta fuera del formulario -->
+    <record id="view_order_line_tree_validacion_multialmacen" model="ir.ui.view">
+        <field name="name">sale.order.line.list.validacion.multialmacen</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale_stock.view_order_line_tree_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='route_ids']" position="attributes">
+                <attribute name="groups">almx_gdl.group_acceso_multialmacen_gdl</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Líneas dentro del formulario de la SO -->
+    <record id="view_order_form_validacion_multialmacen" model="ir.ui.view">
+        <field name="name">sale.order.form.validacion.multialmacen</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']//form//field[@name='route_ids']" position="attributes">
+                <attribute name="groups">almx_gdl.group_acceso_multialmacen_gdl</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//list//field[@name='route_ids']" position="attributes">
+                <attribute name="groups">almx_gdl.group_acceso_multialmacen_gdl</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//list//field[@name='route_ids']" position="after">
+                <field name="x_almacenes_disponibles_ids" column_invisible="True"/>
+                <field name="x_almacen_retirada_id"
+                       groups="almx_gdl.group_acceso_multialmacen_gdl"
+                       optional="show"
+                       domain="[('id', 'in', x_almacenes_disponibles_ids)]"
+                       options="{'no_create': True, 'no_open': True}"
+                       readonly="state in ('sale', 'cancel')"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
