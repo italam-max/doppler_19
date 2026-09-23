@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ALMX - Candado y registro de precios de venta (producto y variante)',
-    'version': '19.0.2.0.0',
+    'version': '19.0.2.0.1',
     'summary': 'Solo el grupo "Editar precio de venta" cambia precios; precio independiente '
                'por variante; todo cambio queda registrado en el chatter',
     'description': """

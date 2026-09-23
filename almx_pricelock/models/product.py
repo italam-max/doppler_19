@@ -3,13 +3,12 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 GROUP = 'almx_pricelock.group_edit_sale_price'
-NO_PERMISSION = _("No tienes permiso para modificar el Precio de venta. "
-                  "Solo el grupo 'Editar precio de venta' puede hacerlo.")
-
-
 def _check_price_permission(env):
     if not env.su and not env.user.has_group(GROUP):
-        raise UserError(NO_PERMISSION)
+        # El texto se traduce aquí (en tiempo de ejecución, con env), no a nivel
+        # de módulo: en 19 _() fuera de un env deja un warning en el log.
+        raise UserError(env._("No tienes permiso para modificar el Precio de venta. "
+                              "Solo el grupo 'Editar precio de venta' puede hacerlo."))
 
 
 class ProductTemplate(models.Model):
