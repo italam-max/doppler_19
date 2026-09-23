@@ -2,6 +2,7 @@
 import base64
 from odoo import api, fields, models, SUPERUSER_ID
 from odoo import models, fields, api, _
+from odoo.orm.identifiers import NewId
 from odoo.exceptions import ValidationError, UserError
 from datetime import date
 from datetime import datetime
@@ -90,7 +91,7 @@ class StockPicking(models.Model):
         pick_moves = pick_picking.move_ids
         out_moves = out_picking.move_ids
 
-        if any(isinstance(m.id, models.NewId) for m in pick_moves | out_moves):
+        if any(isinstance(m.id, NewId) for m in pick_moves | out_moves):
             return
 
         for product in out_moves.product_id:
@@ -106,7 +107,7 @@ class StockPicking(models.Model):
 
     def _almx_autolink_related_moves(self):
         for picking in self:
-            if isinstance(picking.id, models.NewId):
+            if isinstance(picking.id, NewId):
                 continue
             if picking.related_pick_id:
                 picking._almx_sync_pick_out_move_chain(picking.related_pick_id, picking)
@@ -167,7 +168,7 @@ class StockPicking(models.Model):
             return p.picking_type_id.sequence_code
 
         candidates = self.filtered(
-            lambda p: not isinstance(p.id, models.NewId)
+            lambda p: not isinstance(p.id, NewId)
             and p.group_id
             and _seq(p) in ('NWH/PICK/', 'NWH/OUT/')
             and not (p.related_pick_id or p.related_out_id)
@@ -448,7 +449,7 @@ class StockMove(models.Model):
         if vals.get('picking_id'):
             try:
                 pickings = self.mapped('picking_id').filtered(
-                    lambda p: not isinstance(p.id, models.NewId)
+                    lambda p: not isinstance(p.id, NewId)
                 )
                 if pickings:
                     pickings._almx_autolink_related_ids_from_group()
