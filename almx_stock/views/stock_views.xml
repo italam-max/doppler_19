@@ -133,6 +133,17 @@
           <field name="x_studio_tipo_de_venta" readonly="1"/>
           <field name="x_studio_completamente_pagado" string="Venta pagada" readonly="1"/>
           <field name="is_account_manager" invisible="1"/>
+          <!-- ALMX (sept 2026, port a 19): URLs de evidencia fotográfica (vista de
+               Studio de 16). Almacén/Bodega/Laboratorio en salidas; Calidad también
+               en recepciones y devoluciones, donde en 16 hay datos capturados. -->
+          <field name="x_studio_evidencia_fotogrfica" widget="url" placeholder="URL de Almacén"
+                 invisible="picking_type_code != 'outgoing'" readonly="state in ('done', 'cancel')"/>
+          <field name="x_studio_url_bodega" widget="url"
+                 invisible="picking_type_code != 'outgoing'" readonly="state in ('done', 'cancel')"/>
+          <field name="x_studio_url_laboratorio" widget="url"
+                 invisible="picking_type_code != 'outgoing'" readonly="state in ('done', 'cancel')"/>
+          <field name="x_studio_url_calidad" widget="url"
+                 invisible="picking_type_code not in ('outgoing', 'incoming')" readonly="state in ('done', 'cancel')"/>
           <!-- ALMX FIX (sept 2026, port a 19): se quitaron los 12 campos de
                "Material listo" (warehouse/store/lab/quality: _already, _date,
                _check); confirmado que no funcionaban de verdad en 16. -->

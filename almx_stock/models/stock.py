@@ -43,6 +43,22 @@ class StockPicking(models.Model):
     # y el campo se queda de solo lectura para todos por no tener inverse.
     x_studio_completamente_pagado = fields.Boolean(string='Completamente pagado', compute='_compute_completamente_pagado', store=True)
 
+    # ALMX (sept 2026, port a 19): URLs de evidencia fotográfica. En 16 eran
+    # campos de Studio (x_studio_*) mostrados por una vista de Studio que no
+    # sobrevivió la migración; los campos y sus datos SÍ llegaron a 19 como
+    # campos manuales. Se declaran aquí con el mismo nombre técnico para que
+    # dejen de depender de Studio (misma columna, no se pierde información).
+    # Se conservan los 4 porque no está claro en qué momento se usa cada uno.
+    x_studio_evidencia_fotogrfica = fields.Char(
+        string='URL Almacén',
+        help='Enlace de Google Drive con las fotografías de evidencia de esta transferencia.')
+    x_studio_url_bodega = fields.Char(string='URL Bodega')
+    x_studio_url_laboratorio = fields.Char(string='URL Laboratorio')
+    x_studio_url_calidad = fields.Char(string='URL Calidad')
+    # Boolean de Studio sin uso desde 2023 y sin vista en 16; se declara solo
+    # para conservar el histórico, no se muestra.
+    x_studio_adir_evidencia = fields.Boolean(string='Añadir Evidencia')
+
     @api.depends('sale_id.completely_paid')
     def _compute_completamente_pagado(self):
         for rec in self:
