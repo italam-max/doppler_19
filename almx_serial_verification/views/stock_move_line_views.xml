@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Operaciones detalladas: en 19 la serie reservada se ve en quant_id ("Recoger de") -->
+    <record id="view_stock_move_line_detailed_operation_tree_almx_hide_lot" model="ir.ui.view">
+        <field name="name">stock.move.line.detailed.operation.list.almx.hide.lot</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_stock_move_line_detailed_operation_tree"/>
+        <field name="arch" type="xml">
+            <field name="quant_id" position="before">
+                <field name="almx_hide_lot" column_invisible="True"/>
+                <field name="location_id" string="Ubicación origen" readonly="1"
+                       column_invisible="context.get('picking_code') == 'incoming'"
+                       invisible="not almx_hide_lot" groups="stock.group_stock_multi_locations"/>
+            </field>
+            <field name="quant_id" position="attributes">
+                <attribute name="invisible">almx_hide_lot</attribute>
+            </field>
+            <field name="lot_id" position="attributes">
+                <attribute name="invisible">not lots_visible or almx_hide_lot</attribute>
+            </field>
+        </field>
+    </record>
+
+    <!-- Detalle del movimiento (ventana "Operaciones" de cada línea) -->
+    <record id="view_stock_move_line_operation_tree_almx_hide_lot" model="ir.ui.view">
+        <field name="name">stock.move.line.operation.list.almx.hide.lot</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_stock_move_line_operation_tree"/>
+        <field name="arch" type="xml">
+            <field name="quant_id" position="before">
+                <field name="almx_hide_lot" column_invisible="True"/>
+                <field name="location_id" string="Ubicación origen" readonly="1"
+                       column_invisible="not parent.show_quant"
+                       invisible="not almx_hide_lot" groups="stock.group_stock_multi_locations"/>
+            </field>
+            <field name="quant_id" position="attributes">
+                <attribute name="invisible">almx_hide_lot</attribute>
+            </field>
+            <field name="lot_id" position="attributes">
+                <attribute name="invisible">almx_hide_lot</attribute>
+            </field>
+        </field>
+    </record>
+
+    <!-- Columna opcional de series en la lista de movimientos del traslado -->
+    <record id="view_picking_form_almx_hide_lot" model="ir.ui.view">
+        <field name="name">stock.picking.form.almx.hide.lot</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <field name="use_create_lots" position="after">
+                <field name="almx_require_serial_confirmation" invisible="1"/>
+            </field>
+            <xpath expr="//field[@name='move_ids']/list/field[@name='lot_ids']" position="attributes">
+                <attribute name="invisible">not show_details_visible or has_tracking == 'none' or (has_tracking == 'serial' and parent.almx_require_serial_confirmation)</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
