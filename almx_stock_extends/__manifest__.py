@@ -11,6 +11,17 @@ Cuando son creados manualmente, se crea un campo many2one para que se pueda sele
 
 Changelog
 ----------
+- 19.0.1.0.13: Autoenlace PICK/OUT reescrito para 19. Odoo 19 eliminó
+  group_id (grupos de abastecimiento), así que el emparejamiento por
+  grupo tronaba en silencio y ningún PICK/OUT nuevo quedaba ligado (ni
+  el cron). Ahora se empareja por la cadena nativa de movimientos
+  (move_dest_ids / move_orig_ids): solo liga si del otro lado hay
+  exactamente un traslado activo y nunca pisa un valor existente. El
+  cron ya no exige ambos campos vacíos (liga el lado que falte).
+  También: _almx_sync_pick_out_move_chain leía pick_move/out_move, que
+  en traslados recién creados venían en False y hacían que el enlace
+  de movimientos de pares manuales se saltara; ahora lee el tipo directo.
+- 19.0.1.0.12: Fix NewId (import desde odoo.orm.identifiers).
 - 16.0.1.0.11: A petición explícita (se prefiere inmediato sobre
   esperar al cron): se agrega el enlace INMEDIATO real de
   related_pick_id/related_out_id, en StockMove.write() -- reaccionando
@@ -200,7 +211,7 @@ Changelog
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Inventory',
-    'version': '19.0.1.0.12',
+    'version': '19.0.1.0.13',
 
     # any module necessary for this one to work correctly
     'depends': ['base','stock','sale','almx_stock'],

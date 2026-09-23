@@ -83,7 +83,12 @@ class StockPicking(models.Model):
         """
         if not pick_picking or not out_picking:
             return
-        if not (pick_picking.pick_move and out_picking.out_move):
+        # ALMX FIX (19.0, sept 2026): antes se usaban pick_move/out_move, pero
+        # esos campos solo se recalculan como efecto secundario de leer
+        # detect_move_type -- en un traslado recién creado venían en False y
+        # este enlace se saltaba en silencio. Se lee el tipo directo.
+        if not (pick_picking.picking_type_id.sequence_code == 'NWH/PICK/'
+                and out_picking.picking_type_id.sequence_code == 'NWH/OUT/'):
             return
         if not pick_picking.origin or pick_picking.origin != out_picking.origin:
             return
@@ -163,42 +168,40 @@ class StockPicking(models.Model):
     # u otro almacén habría que revisar sus sequence_code o usar
     # warehouse_id.pick_type_id/out_type_id en su lugar.
     # ------------------------------------------------------------------
-    def _almx_autolink_related_ids_from_group(self):
+    # ALMX FIX (19.0, sept 2026): Odoo 19 eliminó los grupos de
+    # abastecimiento (group_id), así que el emparejamiento por grupo tronaba
+    # con AttributeError (absorbido por el try/except de StockMove.write) y
+    # ningún PICK/OUT nuevo quedaba ligado. Ahora se empareja por la CADENA
+    # NATIVA de movimientos: la OUT de un PICK es el traslado al que van los
+    # move_dest_ids de sus movimientos, y viceversa con move_orig_ids. Es
+    # más preciso que el grupo y sigue siendo conservador: solo liga cuando
+    # del otro lado hay exactamente UN traslado activo, y nunca pisa un
+    # related_pick_id/related_out_id que ya tenga valor.
+    def _almx_autolink_related_ids_from_chain(self):
         def _seq(p):
             return p.picking_type_id.sequence_code
 
+        def _active(pickings, seq):
+            return pickings.filtered(lambda x: _seq(x) == seq and x.state != 'cancel')
+
         candidates = self.filtered(
             lambda p: not isinstance(p.id, NewId)
-            and p.group_id
+            and p.state != 'cancel'
             and _seq(p) in ('NWH/PICK/', 'NWH/OUT/')
-            and not (p.related_pick_id or p.related_out_id)
         )
-        if not candidates:
-            return
-
-        group_ids = candidates.group_id.ids
-        siblings = self.env['stock.picking'].search([('group_id', 'in', group_ids)])
-
-        by_group = {}
-        for p in siblings:
-            bucket = by_group.setdefault(p.group_id.id, {'picks': [], 'outs': []})
-            seq = _seq(p)
-            if seq == 'NWH/PICK/':
-                bucket['picks'].append(p)
-            elif seq == 'NWH/OUT/':
-                bucket['outs'].append(p)
-
-        for group_id in group_ids:
-            bucket = by_group.get(group_id, {'picks': [], 'outs': []})
-            picks, outs = bucket['picks'], bucket['outs']
-            # Conservador: solo el caso inequívoco 1 PICK + 1 OUT.
-            if len(picks) != 1 or len(outs) != 1:
-                continue
-            pick, out = picks[0], outs[0]
-            if not out.related_pick_id:
-                out.related_pick_id = pick.id
-            if not pick.related_out_id:
-                pick.related_out_id = out.id
+        for p in candidates:
+            if _seq(p) == 'NWH/PICK/' and not p.related_out_id:
+                outs = _active(p.move_ids.move_dest_ids.picking_id, 'NWH/OUT/')
+                if len(outs) == 1:
+                    p.related_out_id = outs.id
+                    if not outs.related_pick_id:
+                        outs.related_pick_id = p.id
+            elif _seq(p) == 'NWH/OUT/' and not p.related_pick_id:
+                picks = _active(p.move_ids.move_orig_ids.picking_id, 'NWH/PICK/')
+                if len(picks) == 1:
+                    p.related_pick_id = picks.id
+                    if not picks.related_out_id:
+                        picks.related_out_id = p.id
 
     # ------------------------------------------------------------------
     # ALMX FIX (autoenlace PICK/OUT automáticos, sep 2026 -- por qué
@@ -228,12 +231,11 @@ class StockPicking(models.Model):
         since = fields.Datetime.subtract(fields.Datetime.now(), days=days)
         candidates = self.search([
             ('picking_type_id.sequence_code', 'in', ('NWH/PICK/', 'NWH/OUT/')),
-            ('group_id', '!=', False),
-            ('related_pick_id', '=', False),
-            ('related_out_id', '=', False),
+            ('state', '!=', 'cancel'),
+            '|', ('related_pick_id', '=', False), ('related_out_id', '=', False),
             ('create_date', '>=', since),
         ])
-        candidates._almx_autolink_related_ids_from_group()
+        candidates._almx_autolink_related_ids_from_chain()
         # Con related_pick_id/related_out_id ya llenos, el enlace nativo
         # move_orig_ids/move_dest_ids se dispara solo (sin cambios,
         # desde la 16.0.1.0.7).
@@ -452,7 +454,7 @@ class StockMove(models.Model):
                     lambda p: not isinstance(p.id, NewId)
                 )
                 if pickings:
-                    pickings._almx_autolink_related_ids_from_group()
+                    pickings._almx_autolink_related_ids_from_chain()
                     pickings._almx_autolink_related_moves()
             except Exception:
                 import logging
