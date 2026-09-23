@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_inherit_pedimento" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.pedimento</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="almx_is_import" invisible="1"/>
+                <field name="entry_number"
+                       invisible="not almx_is_import and not entry_number"
+                       required="almx_is_import and state not in ('done', 'cancel')"
+                       placeholder="Ej. 26 43 1925 6000244"/>
+            </field>
+        </field>
+    </record>
+</odoo>

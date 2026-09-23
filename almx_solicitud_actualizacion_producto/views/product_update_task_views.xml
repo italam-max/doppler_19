@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="almx_product_update_task_list" model="ir.ui.view">
+        <field name="name">almx.product.update.task.list</field>
+        <field name="model">almx.product.update.task</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="deadline_days"/>
+                <field name="note"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_almx_product_update_task" model="ir.actions.act_window">
+        <field name="name">Tareas de actualización de producto</field>
+        <field name="res_model">almx.product.update.task</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'active_test': False}</field>
+    </record>
+    <menuitem id="menu_almx_product_update_task" name="Tareas de actualización de producto"
+              parent="purchase.menu_purchase_config" action="action_almx_product_update_task" sequence="90"/>
+</odoo>

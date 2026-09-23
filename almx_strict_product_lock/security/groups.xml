@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_allow_product_creation" model="res.groups">
+        <field name="name">Permitir Crear Productos</field>
+        <field name="comment">Únicos usuarios que pueden dar de alta productos y variantes (Dirección y TI).</field>
+    </record>
+</odoo>
