@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="approval_request_view_form_inherit" model="ir.ui.view">
+        <field name="name">approval.request.form.almx.process.op</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+        <field name="arch" type="xml">
+            <field name="location" position="after">
+                <field name="in_process_request" groups="almx_process_op.group_monitoring_process_op"/>
+                <field name="out_process_request" groups="almx_process_op.group_monitoring_process_op"/>
+                <field name="process_reason" groups="almx_process_op.group_monitoring_process_op"
+                       invisible="not out_process_request" required="out_process_request"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="approval_request_view_search_inherit" model="ir.ui.view">
+        <field name="name">approval.request.search.almx.process.op</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_search_view_search"/>
+        <field name="arch" type="xml">
+            <search position="inside">
+                <separator groups="almx_process_op.group_monitoring_process_op"/>
+                <filter name="almx_in_process" string="Dentro del proceso"
+                        domain="[('in_process_request', '=', True)]"
+                        groups="almx_process_op.group_monitoring_process_op"/>
+                <filter name="almx_out_process" string="Fuera del proceso"
+                        domain="[('out_process_request', '=', True)]"
+                        groups="almx_process_op.group_monitoring_process_op"/>
+            </search>
+        </field>
+    </record>
+</odoo>
