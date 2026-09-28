@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="alamex_approval_request" model="ir.ui.view">
+        <field name="name">approval.request.form.almx</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+        <field name="arch" type="xml">
+            <field name="reference" position="after">
+                <field name="is_in_group" invisible="1"/>
+                <field name="x_studio_moneda" force_save="1"
+                       invisible="has_payment_method == 'no'"
+                       readonly="request_status not in ('new', 'pending')"/>
+                <field name="x_studio_pagado" force_save="1" readonly="not is_in_group"/>
+                <field name="x_studio_motivo_de_urgencia" force_save="1"/>
+                <field name="x_studio_tengo_una_po" force_save="1"
+                       invisible="has_payment_method == 'no'"/>
+                <field name="x_studio_po_1" force_save="1"
+                       options="{'no_create': True, 'no_create_edit': True}"
+                       invisible="not x_studio_tengo_una_po"
+                       readonly="request_status not in ('new', 'pending')"
+                       required="x_studio_tengo_una_po"/>
+                <field name="almx_expense_ids" widget="many2many_tags"
+                       options="{'no_create': True}"/>
+            </field>
+            <field name="approver_ids" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>
