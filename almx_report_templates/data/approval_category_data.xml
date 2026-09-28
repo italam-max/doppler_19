@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- "Borrow Computer Items" (DOPPLER ELEVADORES): única categoría que usa el préstamo de equipo -->
+    <record id="approvals.approval_category_data_borrow_items" model="approval.category">
+        <field name="almx_attach_it_equipment" eval="True"/>
+    </record>
+</odoo>

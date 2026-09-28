@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="approval_request_view_form_inherit" model="ir.ui.view">
+        <field name="name">approval.request.form.almx.it.equipment</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Equipo de cómputo" name="almx_it_equipment"
+                      invisible="not almx_attach_it_equipment and not approval_loan">
+                    <field name="almx_attach_it_equipment" invisible="1"/>
+                    <field name="approval_loan" nolabel="1">
+                        <list>
+                            <field name="category_id"/>
+                            <field name="model_id"/>
+                            <field name="serial_number"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

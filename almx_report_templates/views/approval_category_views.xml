@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="approval_category_view_form_it_equipment" model="ir.ui.view">
+        <field name="name">approval.category.form.almx.it.equipment</field>
+        <field name="model">approval.category</field>
+        <field name="inherit_id" ref="approvals.approval_category_view_form"/>
+        <field name="arch" type="xml">
+            <field name="has_location" position="after">
+                <field name="almx_attach_it_equipment"/>
+            </field>
+        </field>
+    </record>
+</odoo>

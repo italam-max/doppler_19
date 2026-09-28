@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_product_form_inherit_extends" model="ir.ui.view">
+        <field name="name">product.product.form.almx.it.equipment</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <field name="barcode" position="after">
+                <field name="stock_it"/>
+                <field name="is_laptop"/>
+                <field name="is_cargador"/>
+            </field>
+        </field>
+    </record>
+</odoo>
