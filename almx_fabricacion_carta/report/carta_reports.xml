@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_carta_fabricacion" model="report.paperformat">
+        <field name="name">Cartas de Fabricación (Carta vertical)</field>
+        <field name="default" eval="False"/>
+        <field name="format">Letter</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">22</field>
+        <field name="margin_left">15</field>
+        <field name="margin_right">15</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">5</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- En 19 ya no existe la etiqueta <report>: se declaran como ir.actions.report -->
+    <record id="action_report_carta_fabricacion" model="ir.actions.report">
+        <field name="name">Carta de Confirmación de Fabricación (ANX-07)</field>
+        <field name="model">project.task</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">almx_fabricacion_carta.report_carta_fabricacion_content</field>
+        <field name="report_file">almx_fabricacion_carta.report_carta_fabricacion_content</field>
+        <field name="paperformat_id" ref="paperformat_carta_fabricacion"/>
+        <field name="binding_model_id" ref="project.model_project_task"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="action_report_carta_termino_fabricacion" model="ir.actions.report">
+        <field name="name">Carta de Término de Fabricación (ANX-08)</field>
+        <field name="model">project.task</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">almx_fabricacion_carta.report_carta_termino_fabricacion_content</field>
+        <field name="report_file">almx_fabricacion_carta.report_carta_termino_fabricacion_content</field>
+        <field name="paperformat_id" ref="paperformat_carta_fabricacion"/>
+        <field name="binding_model_id" ref="project.model_project_task"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="action_report_carta_llegada_almacen" model="ir.actions.report">
+        <field name="name">Carta de Llegada de Equipo a Almacén (ANX-09)</field>
+        <field name="model">project.task</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">almx_fabricacion_carta.report_carta_llegada_almacen_content</field>
+        <field name="report_file">almx_fabricacion_carta.report_carta_llegada_almacen_content</field>
+        <field name="paperformat_id" ref="paperformat_carta_fabricacion"/>
+        <field name="binding_model_id" ref="project.model_project_task"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

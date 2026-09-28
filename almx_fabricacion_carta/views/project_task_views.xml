@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_project_task_form_carta_fab" model="ir.ui.view">
+        <field name="name">project.task.form.almx.carta</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Cartas" name="almx_cartas"
+                      invisible="not almx_carta_fab_generada and not almx_carta_termino_generada and not almx_carta_almacen_generada">
+                    <group>
+                        <field name="almx_carta_fab_generada"/>
+                        <field name="almx_carta_fab_fecha" invisible="not almx_carta_fab_generada"/>
+                        <field name="almx_carta_termino_generada"/>
+                        <field name="almx_carta_termino_fecha" invisible="not almx_carta_termino_generada"/>
+                        <field name="almx_carta_almacen_generada"/>
+                        <field name="almx_carta_almacen_fecha" invisible="not almx_carta_almacen_generada"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!--
+    Template QWeb: Confirmacion de Termino de Fabricacion — MEX-OPE-ANX-08
+
+    Mismo criterio de diseño que report_carta_fabricacion_content (ver
+    ese archivo para el detalle de por que el pie/watermark van con
+    position: fixed en vez de una imagen de fondo estirada).
+
+    Mapeo de los campos editables del formato oficial (Guia de Llenado B
+    del PDF MEX-OPE-ANX-08) a los datos de la tarea:
+      1. Fecha (emision)                       -> fecha_emision (hoy)
+      2. Descripcion del producto/proyecto     -> task.name
+                                                   (ya incluye SO + cliente,
+                                                   ej. "SO52397 - EMBAJADA DE IRAN")
+      3. Numero de orden/contrato/proyecto     -> task.sale_order_id.name
+      4. Fecha de termino de fabricacion       -> fecha_emision (mismo dia
+                                                   en que la tarea entra a
+                                                   la etapa TERMINO DE
+                                                   FABRICACION)
+      5. Nombre completo y firma               -> task.user_ids (Supervisor
+                                                   de Operaciones), igual
+                                                   que en la carta de
+                                                   fabricacion.
+
+    Autor  : Irving Sammer Gonzalez Correa
+    Version: 16.0.2.0.0
+-->
+<template id="report_carta_termino_fabricacion_content">
+    <t t-call="web.basic_layout">
+        <t t-foreach="docs" t-as="task">
+            <div class="page" style="
+                font-family: Arial, sans-serif;
+                font-size: 10pt;
+                color: #000000;
+                margin: 0;
+                padding: 0;
+                position: relative;
+            ">
+
+                <!-- ============================================================
+                     FONDO: watermark centrado (detras del contenido)
+                ============================================================ -->
+                <div style="
+                    position: fixed;
+                    top: 260px;
+                    left: 0;
+                    width: 100%;
+                    text-align: center;
+                ">
+                    <img src="/almx_fabricacion_carta/static/src/img/alamex_watermark.png"
+                         style="width: 65%; opacity: 0.55;"/>
+                </div>
+
+                <!-- ============================================================
+                     FONDO: franja curva del pie, anclada al borde real
+                     inferior de la hoja, ancho completo.
+                ============================================================ -->
+                <div style="
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                ">
+                    <img src="/almx_fabricacion_carta/static/src/img/alamex_footer_band.png"
+                         style="width: 100%; display: block;"/>
+                </div>
+
+                <!-- ============================================================
+                     CONTENIDO REAL — se pinta por encima del fondo
+                ============================================================ -->
+                <div style="position: relative;">
+
+                    <!-- ENCABEZADO -->
+                    <table style="
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 24px;
+                        border: 1.5px solid #003087;
+                        background-color: #ffffff;
+                    ">
+                        <tr>
+                            <td style="
+                                width: 18%;
+                                border-right: 1.5px solid #003087;
+                                padding: 6px 10px;
+                                vertical-align: middle;
+                                text-align: center;
+                            ">
+                                <img src="/almx_fabricacion_carta/static/src/img/alamex_logo.png"
+                                     style="max-height: 42px; max-width: 90px;"
+                                     alt="ALAMEX"/>
+                            </td>
+                            <td style="
+                                width: 52%;
+                                border-right: 1.5px solid #003087;
+                                padding: 0;
+                                vertical-align: middle;
+                            ">
+                                <div style="
+                                    background-color: #003087;
+                                    color: #ffffff;
+                                    font-weight: bold;
+                                    text-align: center;
+                                    padding: 4px 6px;
+                                    font-size: 9pt;
+                                    border-bottom: 1px solid #003087;
+                                ">OPERACIONES</div>
+                                <div style="
+                                    text-align: center;
+                                    padding: 6px;
+                                    font-size: 9pt;
+                                    font-weight: bold;
+                                ">Carta de Confirmación de Fabricación</div>
+                            </td>
+                            <td style="
+                                width: 30%;
+                                padding: 0;
+                                vertical-align: top;
+                                font-size: 8.5pt;
+                            ">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="
+                                            background-color: #003087;
+                                            color: #ffffff;
+                                            font-weight: bold;
+                                            padding: 3px 6px;
+                                            border-bottom: 1px solid #c8c8c8;
+                                            width: 50%;
+                                        ">Clave:</td>
+                                        <td style="
+                                            padding: 3px 6px;
+                                            border-bottom: 1px solid #c8c8c8;
+                                        ">MEX-OPE-ANX-08</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="
+                                            background-color: #003087;
+                                            color: #ffffff;
+                                            font-weight: bold;
+                                            padding: 3px 6px;
+                                            border-bottom: 1px solid #c8c8c8;
+                                        ">Versión:</td>
+                                        <td style="
+                                            padding: 3px 6px;
+                                            border-bottom: 1px solid #c8c8c8;
+                                        ">00</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="
+                                            background-color: #003087;
+                                            color: #ffffff;
+                                            font-weight: bold;
+                                            padding: 3px 6px;
+                                        ">Actualización:</td>
+                                        <td style="padding: 3px 6px;">Julio - 26</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- TITULO -->
+                    <p style="
+                        text-align: center;
+                        font-weight: bold;
+                        font-size: 12pt;
+                        letter-spacing: 0.5px;
+                        margin: 28px 0 36px 0;
+                    ">CONFIRMACIÓN DE TÉRMINO DE FABRICACIÓN</p>
+
+                    <!-- FECHA (campo 1: fecha de emision) -->
+                    <p style="text-align: right; margin: 0 0 36px 0;">
+                        Fecha:
+                        <t t-set="fecha_doc"
+                           t-value="task.almx_carta_termino_fecha or datetime.date.today()"/>
+                        <span t-out="fecha_doc.strftime('%d/%m/%Y')"/>
+                    </p>
+
+                    <!-- CUERPO -->
+                    <p style="margin: 0 0 18px 0;">A quien corresponda:</p>
+
+                    <p style="text-align: justify; margin: 0 0 14px 0;">
+                        Por medio de la presente, se informa que el proceso de fabricación
+                        correspondiente a
+                        <t t-set="descripcion_proyecto" t-value="task.name or ''"/>
+                        <span t-out="descripcion_proyecto"/>, identificado con
+                        <t t-set="numero_orden"
+                           t-value="task.sale_order_id.name if task.sale_order_id else ''"/>
+                        <span t-out="numero_orden"/>,
+                        ha sido concluido satisfactoriamente en fecha
+                        <span t-out="fecha_doc.strftime('%d/%m/%Y')"/>.
+                    </p>
+
+                    <p style="text-align: justify; margin: 0 0 14px 0;">
+                        El producto ha sido fabricado conforme a las especificaciones
+                        previamente acordadas, cumpliendo con los estándares de calidad
+                        establecidos.
+                    </p>
+
+                    <p style="text-align: justify; margin: 0 0 14px 0;">
+                        Quedamos atentos para coordinar los siguientes pasos y cualquier
+                        requerimiento adicional.
+                    </p>
+
+                    <p style="text-align: justify; margin: 0 0 48px 0;">
+                        Sin más por el momento, agradecemos su atención.
+                    </p>
+
+                    <!-- FIRMA — sin linea, documento generado automaticamente -->
+                    <p style="margin: 0 0 60px 0;">Atentamente,</p>
+
+                    <div style="text-align: center;">
+                        <t t-set="supervisor_txt"
+                           t-value="', '.join(task.user_ids.mapped('name')) if task.user_ids else 'Sin asignar'"/>
+                        <p style="margin: 0; font-weight: bold;">
+                            <t t-out="supervisor_txt"/>
+                        </p>
+                        <p style="margin: 4px 0 0 0;">Supervisor de Operaciones</p>
+                    </div>
+
+                </div>
+                <!-- /contenido real -->
+
+            </div>
+        </t>
+    </t>
+</template>
+
+</odoo>
