@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_task_form_almx_gmd_add" model="ir.ui.view">
+        <field name="name">project.task.form.almx.guiasm</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <field name="tag_ids" position="after">
+                <field name="format_finally" filename="format_finally_filename"/>
+                <field name="format_finally_filename" invisible="1"/>
+            </field>
+        </field>
+    </record>
+</odoo>

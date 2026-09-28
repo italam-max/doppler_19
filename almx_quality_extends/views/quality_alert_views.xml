@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Formulario: mostrar el número de pedimento junto a la Transferencia -->
+    <record id="quality_alert_view_form_entry_number" model="ir.ui.view">
+        <field name="name">quality.alert.view.form.entry.number</field>
+        <field name="model">quality.alert</field>
+        <field name="inherit_id" ref="quality_control.quality_alert_view_form"/>
+        <field name="arch" type="xml">
+            <field name="picking_id" position="after">
+                <field name="entry_number"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Lista: columna opcional junto a los lotes (en 19 lot_id pasó a lot_ids) -->
+    <record id="quality_alert_view_tree_entry_number" model="ir.ui.view">
+        <field name="name">quality.alert.view.tree.entry.number</field>
+        <field name="model">quality.alert</field>
+        <field name="inherit_id" ref="quality.quality_alert_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="lot_ids" position="after">
+                <field name="entry_number" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Búsqueda: permitir filtrar y agrupar por número de pedimento -->
+    <record id="quality_alert_view_search_entry_number" model="ir.ui.view">
+        <field name="name">quality.alert.view.search.entry.number</field>
+        <field name="model">quality.alert</field>
+        <field name="inherit_id" ref="quality.quality_alert_view_search"/>
+        <field name="arch" type="xml">
+            <field name="tag_ids" position="after">
+                <field name="entry_number" string="Número de Pedimento"/>
+            </field>
+            <filter name="groupby_team_id" position="after">
+                <filter name="groupby_entry_number"
+                        string="Número de Pedimento"
+                        context="{'group_by': 'entry_number'}"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>
