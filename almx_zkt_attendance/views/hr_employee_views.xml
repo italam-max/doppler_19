@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_employee_form_zk_pin" model="ir.ui.view">
+        <field name="name">hr.employee.form.zk.pin</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- En 19 barcode vive dentro de un div.o_row con su botón "Generate": se inserta después del div -->
+            <xpath expr="//field[@name='barcode']/.." position="after">
+                <field name="zk_pin"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
