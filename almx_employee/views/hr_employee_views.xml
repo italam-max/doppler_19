@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="alamex_hr_employee_form" model="ir.ui.view">
+        <field name="name">hr.employee.form.almx</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" icon="fa-folder-open" type="object"
+                        name="action_almx_open_files" groups="hr.group_hr_user">
+                    <field name="almx_file_count" string="Expediente" widget="statinfo"/>
+                </button>
+            </div>
+            <field name="work_email" position="after">
+                <field name="x_studio_fecha_de_ingreso" groups="hr.group_hr_user"/>
+            </field>
+            <field name="job_id" position="after">
+                <field name="x_studio_candidato" groups="hr.group_hr_user"
+                       options="{'no_create': True}"/>
+            </field>
+            <group name="identification_group" position="after">
+                <group name="almx_documents_group" string="Documentos firmados" groups="hr.group_hr_user">
+                    <field name="x_studio_job_description_agreement"/>
+                    <field name="x_studio_image_use_consent"/>
+                    <field name="x_studio_confidenciality_agreement"/>
+                </group>
+                <group name="proof_information_group" string="Comprobantes de alta" groups="hr.group_hr_user">
+                    <field name="x_studio_field_Lc39r"/>
+                    <field name="x_studio_field_PxX8o"/>
+                    <field name="x_studio_field_yAgYM"/>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>
