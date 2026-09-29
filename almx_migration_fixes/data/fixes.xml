@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Se ejecuta al instalar y en cada actualización del módulo -->
+    <function model="almx.migration.fixes" name="run_all"/>
+</odoo>
