@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- En 16 existía el tipo de actividad "Reminder" (id 18); en 19 no está -->
+    <!-- En 16 existía el tipo "Reminder" (id 18, categoría reminder); en 19 no existe ni la categoría -->
     <record id="activity_type_recordatorio" model="mail.activity.type">
         <field name="name">Recordatorio</field>
-        <field name="category">reminder</field>
+        <field name="category">default</field>
+        <field name="decoration_type">warning</field>
         <field name="icon">fa-bell</field>
         <field name="delay_count">0</field>
     </record>

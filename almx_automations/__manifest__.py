@@ -1,6 +1,6 @@
 {
     'name': 'Alamex - Acciones automatizadas',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'summary': 'Acciones automatizadas de 16 versionadas como código (el upgrade a 19 las desactivó o las perdió)',
     'description': """
 35 acciones automatizadas de Alamex en uso en 16 (actividad en los últimos 60 días),
