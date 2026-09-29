@@ -1,9 +1,9 @@
 {
     'name': 'Alamex - Acciones automatizadas',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.0.2',
     'summary': 'Acciones automatizadas de 16 versionadas como código (el upgrade a 19 las desactivó o las perdió)',
     'description': """
-35 acciones automatizadas de Alamex en uso en 16 (actividad en los últimos 60 días),
+34 acciones automatizadas de Alamex en uso en 16 (actividad en los últimos 60 días),
 revisadas y ajustadas para Odoo 19:
 
 - Almacén/Compras: devoluciones, recepción de contenedores, seguimiento y analista de compras.

@@ -28,6 +28,8 @@ for request in records:
         <field name="model_id" ref="maintenance.model_maintenance_request"/>
         <field name="trigger">on_write</field>
         <field name="filter_domain">[("stage_id", "=", 5), ("maintenance_team_id", "in", [6, 2, 8, 9, 7])]</field>
+        <!-- Inactiva: la encuesta de satisfacción (survey id 172) se mantiene archivada en 19 -->
+        <field name="active" eval="False"/>
     </record>
     <record id="auto_54_act0" model="ir.actions.server">
         <field name="name">Mantenimiento: encuesta de satisfacción al terminar (antes "Test")</field>

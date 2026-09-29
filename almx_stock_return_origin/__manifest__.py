@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ALMX Stock Return Origin',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.2.0',
     'summary': 'Hace que las devoluciones regresen a la ubicación real de picking (Almacén 2/3, etc.) en vez de detenerse en la ubicación intermedia de entregas (Almacén 1).',
     'description': """
 ALMX Stock Return Origin
@@ -9,6 +9,10 @@ ALMX Stock Return Origin
 
 Changelog
 ----------
+- 19.0.1.2.0: También las devoluciones de traslados internos (PICK) regresan a
+  la ubicación real de donde salió el producto, en vez del padre
+  "Stock Doppler". Reemplaza la automatización de 16 "Devoluciones:
+  reubicar a almacén de origen real", que nunca se ejecutaba.
 - 19.0.1.1.0: Port a Odoo 19, reescrito sobre el wizard de 19.
   - En 19 _prepare_move_default_values vive en la LÍNEA del wizard
     (stock.return.picking.line) y la reserva ya no está separada de la

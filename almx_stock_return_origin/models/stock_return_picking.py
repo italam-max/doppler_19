@@ -20,9 +20,15 @@ class StockReturnPickingLine(models.TransientModel):
         origin_move = self.move_id
         if not origin_move:
             return []
-        pick_moves = origin_move.move_orig_ids.filtered(
-            lambda m: m.picking_type_id.code == 'internal' and m.state == 'done'
-        )
+        if origin_move.picking_type_id.code == 'internal' and origin_move.state == 'done':
+            # Devolución de un traslado interno (p. ej. un PICK): regresa a las
+            # ubicaciones reales de donde salió ese mismo movimiento. Sin esto la
+            # devolución caía en el padre "Stock Doppler" (74 casos en 2026 en 16).
+            pick_moves = origin_move
+        else:
+            pick_moves = origin_move.move_orig_ids.filtered(
+                lambda m: m.picking_type_id.code == 'internal' and m.state == 'done'
+            )
         if not pick_moves:
             return []
         uom = origin_move.product_uom
