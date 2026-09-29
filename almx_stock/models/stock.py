@@ -105,7 +105,20 @@ class StockPicking(models.Model):
                 parts.append(partner.country_id.name)
             rec.address_display = ', '.join(parts) if parts else False
 
+    def _almx_check_payment_gate(self):
+        """Candado de pago del lado del servidor. En la vista el botón Validar ya se
+        ocultaba con not_validate, pero la validación automática del OUT al terminar el
+        PICK (almx_stock_validate_restriction, regla 3) y cualquier llamada directa lo
+        saltaban: en 16 hubo 36 OUT de Refacciones validadas sin pago en 2026."""
+        blocked = self.filtered('not_validate')
+        if blocked:
+            raise UserError(_(
+                "🚫 No se puede validar %(names)s: es una venta de Refacciones sin pago "
+                "confirmado por Finanzas (Venta pagada).",
+                names=', '.join(blocked.mapped('name'))))
+
     def button_validate(self):
+        self._almx_check_payment_gate()
         #Verificamos que pertenezca o nó al grupo de validación Manual.
         #1- Si no esta en el grupo puede validar operaciones manuales
         if not self.env.user.has_group('almx_stock.no_validate_manual_picking'):
