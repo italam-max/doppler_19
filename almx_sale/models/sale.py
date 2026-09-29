@@ -48,6 +48,15 @@ class SaleOrder(models.Model):
                                   "Solicítalo al área de TI.") % ', '.join(locked.mapped('name')))
         return super().write(vals)
 
+    def action_confirm(self):
+        # El Tipo de venta decide el candado de pago del OUT (Refacciones) y las
+        # automatizaciones de Mantenimiento/Instalaciones. En 16 se podía confirmar sin
+        # él: 89 OUT de 2026 salieron de SO sin tipo y se saltaron el candado de pago.
+        missing = self.filtered(lambda o: not o.sale_type)
+        if missing:
+            raise UserError(_("Indica el Tipo de venta antes de confirmar: %s") % ', '.join(missing.mapped('name')))
+        return super().action_confirm()
+
     def action_cancel(self):
         if not self._almx_is_so_admin():
             raise UserError(_("Solo el área de TI puede cancelar pedidos de venta."))
