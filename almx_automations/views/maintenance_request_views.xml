@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="maintenance_request_form_sale_line" model="ir.ui.view">
+        <field name="name">maintenance.request.form.almx.sale.line</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+        <field name="arch" type="xml">
+            <field name="maintenance_team_id" position="after">
+                <field name="x_studio_field_ypPfL" readonly="1"/>
+                <field name="x_studio_field_UT6zf" readonly="1" options="{'no_open': False}"/>
+            </field>
+        </field>
+    </record>
+</odoo>

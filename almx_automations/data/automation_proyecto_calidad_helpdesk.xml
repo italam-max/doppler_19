@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 16: base.automation id 40 -->
+    <record id="auto_40" model="base.automation">
+        <field name="name">Guías Preliminares</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[["project_id.id","=",135]]</field>
+    </record>
+    <record id="auto_40_act0" model="ir.actions.server">
+        <field name="name">Guías Preliminares</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_40')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">mail_post</field>
+        <field name="mail_post_method">email</field>
+        <field name="template_id" eval="298"/>
+    </record>
+
+    <!-- 16: base.automation id 93 -->
+    <record id="auto_93" model="base.automation">
+        <field name="name">Actividad para Calidad Inst - Mod</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("stage_id", "=", 320), ("project_id", "in", [8, 92])]</field>
+    </record>
+    <record id="auto_93_act0" model="ir.actions.server">
+        <field name="name">Actividad para Calidad Inst - Mod</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_93')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Programar mantenimientos gratuitos</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="964"/>
+    </record>
+
+    <!-- 16: base.automation id 94 -->
+    <record id="auto_94" model="base.automation">
+        <field name="name">Actividad para Calidad Inst - Mod</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("stage_id", "in", [608, 611]), ("project_id", "in", [8, 92])]</field>
+        <field name="filter_pre_domain">[("stage_id", "in", [260, 324, 229])]</field>
+    </record>
+    <record id="auto_94_act0" model="ir.actions.server">
+        <field name="name">Actividad para Calidad Inst - Mod</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_94')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Realizar Inspección de Calidad</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="844"/>
+    </record>
+
+    <!-- 16: base.automation id 88 -->
+    <record id="auto_88" model="base.automation">
+        <field name="name">Actividad para Calidad Inst - Mod</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("stage_id", "in", [609, 612]), ("project_id", "in", [8, 92])]</field>
+        <field name="filter_pre_domain">[("stage_id", "in", [608, 611])]</field>
+    </record>
+    <record id="auto_88_act0" model="ir.actions.server">
+        <field name="name">Actividad para Calidad Inst - Mod</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_88')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Validar pago</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="60"/>
+    </record>
+
+    <!-- 16: base.automation id 90 -->
+    <record id="auto_90" model="base.automation">
+        <field name="name">Actividad para Calidad Inst - Mod</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("stage_id", "in", [609, 612]), ("project_id", "in", [8, 92, 132])]</field>
+        <field name="filter_pre_domain">[("stage_id", "in", [608, 611])]</field>
+    </record>
+    <record id="auto_90_act0" model="ir.actions.server">
+        <field name="name">Actividad para Calidad Inst - Mod</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_90')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Coordinar entrega</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="38525"/>
+    </record>
+
+    <!-- 16: base.automation id 89 -->
+    <record id="auto_89" model="base.automation">
+        <field name="name">Actividad para Calidad Inst - Mod</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("stage_id", "in", [608, 611]), ("project_id", "in", [8, 92])]</field>
+        <field name="filter_pre_domain">[("stage_id", "in", [260, 324, 229])]</field>
+    </record>
+    <record id="auto_89_act0" model="ir.actions.server">
+        <field name="name">Actividad para Calidad Inst - Mod</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_89')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Realizar Cobranza</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="60"/>
+    </record>
+
+    <!-- 16: base.automation id 36 -->
+    <record id="auto_36" model="base.automation">
+        <field name="name">Inspecciones Mantenimientos</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[["project_id.id","=",138]]</field>
+    </record>
+    <record id="auto_36_act0" model="ir.actions.server">
+        <field name="name">Inspecciones Mantenimientos</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_36')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">mail_post</field>
+        <field name="mail_post_method">email</field>
+        <field name="template_id" eval="313"/>
+    </record>
+
+    <!-- 16: base.automation id 37 -->
+    <record id="auto_37" model="base.automation">
+        <field name="name">Inspecciones Modernizaciones</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[["project_id.id","=",137]]</field>
+    </record>
+    <record id="auto_37_act0" model="ir.actions.server">
+        <field name="name">Inspecciones Modernizaciones</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_37')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">mail_post</field>
+        <field name="mail_post_method">email</field>
+        <field name="template_id" eval="313"/>
+    </record>
+
+    <!-- 16: base.automation id 38 -->
+    <record id="auto_38" model="base.automation">
+        <field name="name">Inspecciones Modernizaciones</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[["project_id.id","=",132]]</field>
+    </record>
+    <record id="auto_38_act0" model="ir.actions.server">
+        <field name="name">Inspecciones Modernizaciones</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_38')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">mail_post</field>
+        <field name="mail_post_method">email</field>
+        <field name="template_id" eval="313"/>
+    </record>
+
+    <!-- 16: base.automation id 35 -->
+    <record id="auto_35" model="base.automation">
+        <field name="name">Inspecciones Reparaciones</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[["project_id.id","=",110]]</field>
+    </record>
+    <record id="auto_35_act0" model="ir.actions.server">
+        <field name="name">Inspecciones Reparaciones</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_35')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">mail_post</field>
+        <field name="mail_post_method">email</field>
+        <field name="template_id" eval="313"/>
+    </record>
+
+    <!-- 16: base.automation id 28 -->
+    <record id="auto_28" model="base.automation">
+        <field name="name">EBIRBE: Add salesman as follower on the service tasks - I#8289</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[["sale_order_id","!=",False]]</field>
+    </record>
+    <record id="auto_28_act0" model="ir.actions.server">
+        <field name="name">EBIRBE: Add salesman as follower on the service tasks - I#8289</field>
+        <field name="model_id" eval="ref('project.model_project_task')"/>
+        <field name="base_automation_id" eval="ref('auto_28')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+salesman = record.sudo().sale_order_id.user_id.partner_id
+record.sudo().message_subscribe(partner_ids=salesman.ids)
+        ]]></field>
+    </record>
+
+    <!-- 16: base.automation id 136 -->
+    <record id="auto_136" model="base.automation">
+        <field name="name">Auto-suscribir mencionados (@) en tareas de Proyecto</field>
+        <field name="model_id" ref="mail.model_mail_message"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[('model','=','project.task'),('partner_ids','!=',False)]</field>
+    </record>
+    <record id="auto_136_act0" model="ir.actions.server">
+        <field name="name">Auto-suscribir mencionados (@) en tareas de Proyecto</field>
+        <field name="model_id" eval="ref('mail.model_mail_message')"/>
+        <field name="base_automation_id" eval="ref('auto_136')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for message in records:
+    if message.model == 'project.task' and message.res_id and message.partner_ids:
+        task = env['project.task'].browse(message.res_id)
+        if task.exists():
+            missing = message.partner_ids - task.message_partner_ids
+            if missing:
+                task.message_subscribe(partner_ids=missing.ids)
+        ]]></field>
+    </record>
+
+    <!-- 16: base.automation id 75 -->
+    <record id="auto_75" model="base.automation">
+        <field name="name">Actividad Calidad</field>
+        <field name="model_id" ref="quality.model_quality_alert"/>
+        <field name="trigger">on_create</field>
+    </record>
+    <record id="auto_75_act0" model="ir.actions.server">
+        <field name="name">Actividad Calidad</field>
+        <field name="model_id" eval="ref('quality.model_quality_alert')"/>
+        <field name="base_automation_id" eval="ref('auto_75')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Nueva Alerta de Calidad</field>
+        <field name="activity_date_deadline_range" eval="2"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="1028"/>
+    </record>
+
+    <!-- 16: base.automation id 99 -->
+    <record id="auto_99" model="base.automation">
+        <field name="name">Seguidores</field>
+        <field name="model_id" ref="quality.model_quality_alert"/>
+        <field name="trigger">on_create</field>
+    </record>
+    <record id="auto_99_act0" model="ir.actions.server">
+        <field name="name">Seguidores</field>
+        <field name="model_id" eval="ref('quality.model_quality_alert')"/>
+        <field name="base_automation_id" eval="ref('auto_99')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">followers</field>
+        <field name="followers_type">specific</field>
+        <field name="partner_ids" eval="[(6, 0, [18158, 20290, 14067, 13131, 16162, 24856])]"/>
+    </record>
+
+    <!-- 16: base.automation id 137 -->
+    <record id="auto_137" model="base.automation">
+        <field name="name">Helpdesk: bloquear cierre por no-miembro de la mesa</field>
+        <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[('stage_id.fold','=',True)]</field>
+        <field name="filter_pre_domain">[('stage_id.fold','=',False)]</field>
+    </record>
+    <record id="auto_137_act0" model="ir.actions.server">
+        <field name="name">Helpdesk: bloquear cierre por no-miembro de la mesa</field>
+        <field name="model_id" eval="ref('helpdesk.model_helpdesk_ticket')"/>
+        <field name="base_automation_id" eval="ref('auto_137')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for record in records:
+    if record.stage_id.fold:
+        team = record.team_id
+        is_member = bool(team) and env.user in team.member_ids
+        if not is_member:
+            team_name = team.name if team else 'sin mesa asignada'
+            raise UserError("Solo los miembros de la mesa '%s' pueden cerrar este ticket." % team_name)
+        ]]></field>
+    </record>
+
+    <!-- 16: base.automation id 104 -->
+    <record id="auto_104" model="base.automation">
+        <field name="name">En proceso Laboratorio</field>
+        <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["stage_id","=",54]]</field>
+        <field name="filter_pre_domain">[["stage_id","=",53]]</field>
+    </record>
+    <record id="auto_104_act0" model="ir.actions.server">
+        <field name="name">En proceso Laboratorio</field>
+        <field name="model_id" eval="ref('helpdesk.model_helpdesk_ticket')"/>
+        <field name="base_automation_id" eval="ref('auto_104')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">mail_post</field>
+        <field name="mail_post_method">email</field>
+        <field name="template_id" eval="1233"/>
+    </record>
+</odoo>

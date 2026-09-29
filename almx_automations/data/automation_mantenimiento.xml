@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 16: base.automation id 105 -->
+    <record id="auto_105" model="base.automation">
+        <field name="name">Follow Client</field>
+        <field name="model_id" ref="maintenance.model_maintenance_request"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["equipment_id","!=",False]]</field>
+        <field name="filter_pre_domain">[["equipment_id","=",False]]</field>
+    </record>
+    <record id="auto_105_act0" model="ir.actions.server">
+        <field name="name">Follow Client</field>
+        <field name="model_id" eval="ref('maintenance.model_maintenance_request')"/>
+        <field name="base_automation_id" eval="ref('auto_105')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for request in records:
+  partner = request.x_studio_client
+  request.message_subscribe(partner.ids)
+        ]]></field>
+    </record>
+
+    <!-- 16: base.automation id 54 -->
+    <record id="auto_54" model="base.automation">
+        <field name="name">Mantenimiento: encuesta de satisfacción al terminar (antes "Test")</field>
+        <field name="model_id" ref="maintenance.model_maintenance_request"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("stage_id", "=", 5), ("maintenance_team_id", "in", [6, 2, 8, 9, 7])]</field>
+    </record>
+    <record id="auto_54_act0" model="ir.actions.server">
+        <field name="name">Mantenimiento: encuesta de satisfacción al terminar (antes "Test")</field>
+        <field name="model_id" eval="ref('maintenance.model_maintenance_request')"/>
+        <field name="base_automation_id" eval="ref('auto_54')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">mail_post</field>
+        <field name="mail_post_method">email</field>
+        <field name="template_id" eval="ref('mail_template_evaluacion_mantenimiento')"/>
+    </record>
+
+    <!-- 16: base.automation id 63 -->
+    <record id="auto_63" model="base.automation">
+        <field name="name">Responsable</field>
+        <field name="model_id" ref="maintenance.model_maintenance_request"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[["x_studio_field_ypPfL","!=",False]]</field>
+    </record>
+    <record id="auto_63_act0" model="ir.actions.server">
+        <field name="name">Responsable</field>
+        <field name="model_id" eval="ref('maintenance.model_maintenance_request')"/>
+        <field name="base_automation_id" eval="ref('auto_63')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# 16 era "Actualizar registro" (técnico + tipo preventivo); en 19 se hace con código.
+records.write({'user_id': 38525, 'maintenance_type': 'preventive'})
+        ]]></field>
+    </record>
+</odoo>

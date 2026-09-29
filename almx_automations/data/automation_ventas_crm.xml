@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 16: base.automation id 16 -->
+    <record id="auto_16" model="base.automation">
+        <field name="name">Create Maintenance Request</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["state","=","sale"]]</field>
+        <field name="filter_pre_domain">["|",["state","=","draft"],["state","=","sent"]]</field>
+    </record>
+    <record id="auto_16_act0" model="ir.actions.server">
+        <field name="name">Create Maintenance Request</field>
+        <field name="model_id" eval="ref('sale.model_sale_order')"/>
+        <field name="base_automation_id" eval="ref('auto_16')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for counter, line in enumerate(record.order_line.filtered(
+        lambda l: l.product_id.recurring_invoice and l.product_id.x_studio_field_mmOq4 and l.product_id.x_studio_field_RhizH), 1):
+    for count in range(1, int(line.product_uom_qty) + 1):
+        # 19: name_get() ya no existe -> display_name
+        request_name = ' - '.join((line.product_id.display_name, str(counter), str(count), line.order_id.partner_id.name))
+        env['maintenance.request'].create({
+            'name': request_name,
+            'kanban_state': 'normal',
+            'maintenance_team_id': line.product_id.x_studio_field_RhizH.id,
+            'x_studio_field_UT6zf': line.id,
+            'description': line.product_id.description_sale,
+            'company_id': line.order_id.partner_id.company_id.id or line.order_id.company_id.id,
+        })
+        ]]></field>
+    </record>
+
+    <!-- 16: base.automation id 84 -->
+    <record id="auto_84" model="base.automation">
+        <field name="name">Recordatorio Finanzas</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["sale_type","in",["modern","project","mantto"]]]</field>
+        <field name="filter_pre_domain">[["state","=","draft"]]</field>
+    </record>
+    <record id="auto_84_act0" model="ir.actions.server">
+        <field name="name">Recordatorio Finanzas</field>
+        <field name="model_id" eval="ref('sale.model_sale_order')"/>
+        <field name="base_automation_id" eval="ref('auto_84')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="ref('activity_type_recordatorio')"/>
+        <field name="activity_summary">Nuevo pedido de venta</field>
+        <field name="activity_note">Seguimiento de presupuesto para la propuesta económica.</field>
+        <field name="activity_date_deadline_range" eval="3"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="60"/>
+    </record>
+
+    <!-- 16: base.automation id 80 -->
+    <record id="auto_80" model="base.automation">
+        <field name="name">Nuevo presupuesto creado (Silvia+Martha)</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["sale_type","in",["modern","project"]]]</field>
+        <field name="filter_pre_domain">[["state","=","draft"]]</field>
+    </record>
+    <record id="auto_80_act0" model="ir.actions.server">
+        <field name="name">Nuevo presupuesto creado (Silvia+Martha) (1)</field>
+        <field name="model_id" eval="ref('sale.model_sale_order')"/>
+        <field name="base_automation_id" eval="ref('auto_80')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_note">Nuevo presupuesto creado&amp;nbsp;</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="22993"/>
+    </record>
+    <record id="auto_80_act1" model="ir.actions.server">
+        <field name="name">Nuevo presupuesto creado (Silvia+Martha) (2)</field>
+        <field name="model_id" eval="ref('sale.model_sale_order')"/>
+        <field name="base_automation_id" eval="ref('auto_80')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_note">Nuevo presupuesto creado&amp;nbsp;</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="60"/>
+    </record>
+
+    <!-- 16: base.automation id 86 -->
+    <record id="auto_86" model="base.automation">
+        <field name="name">Acción Supply Contrato</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["x_studio_contrato","!=",False]]</field>
+        <field name="filter_pre_domain">[["x_studio_contrato","=",False]]</field>
+    </record>
+    <record id="auto_86_act0" model="ir.actions.server">
+        <field name="name">Acción Supply Contrato</field>
+        <field name="model_id" eval="ref('sale.model_sale_order')"/>
+        <field name="base_automation_id" eval="ref('auto_86')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Realizar Pick</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="38546"/>
+    </record>
+
+    <!-- 16: base.automation id 85 -->
+    <record id="auto_85" model="base.automation">
+        <field name="name">Acción Supply Contrato</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["x_studio_contrato","!=",False]]</field>
+        <field name="filter_pre_domain">[["x_studio_contrato","=",False]]</field>
+    </record>
+    <record id="auto_85_act0" model="ir.actions.server">
+        <field name="name">Acción Supply Contrato</field>
+        <field name="model_id" eval="ref('sale.model_sale_order')"/>
+        <field name="base_automation_id" eval="ref('auto_85')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Relizar compra</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="22993"/>
+    </record>
+
+    <!-- 16: base.automation id 95 -->
+    <record id="auto_95" model="base.automation">
+        <field name="name">Acción Ventas, aprobación de contratos</field>
+        <field name="model_id" ref="approvals.model_approval_request"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[["category_id","=",18]]</field>
+    </record>
+    <record id="auto_95_act0" model="ir.actions.server">
+        <field name="name">Acción Ventas, aprobación de contratos</field>
+        <field name="model_id" eval="ref('approvals.model_approval_request')"/>
+        <field name="base_automation_id" eval="ref('auto_95')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Nueva aprobación de contrato</field>
+        <field name="activity_date_deadline_range" eval="0"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="817"/>
+    </record>
+
+    <!-- 16: base.automation id 96 -->
+    <record id="auto_96" model="base.automation">
+        <field name="name">Asignar Responsable Inst Mod</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("state", "=", "sale")]</field>
+        <field name="filter_pre_domain">[("state", "!=", "sale")]</field>
+    </record>
+    <record id="auto_96_act0" model="ir.actions.server">
+        <field name="name">Asignar Responsable Inst Mod</field>
+        <field name="model_id" eval="ref('sale.model_sale_order')"/>
+        <field name="base_automation_id" eval="ref('auto_96')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+tarea_previa = env['project.task'].search([('sale_order_id', '=', record.id)], limit=1)
+
+if record.state == 'sale' and not tarea_previa:
+    project_id = False
+    stage_id = False
+    tipo_label = "Servicio" # Valor por defecto
+
+    s_type = str(record.sale_type).lower() if record.sale_type else ""
+
+    es_nuevo_check = False
+    if 'x_studio_es_equipo_nuevo' in record._fields:
+        es_nuevo_check = record.x_studio_es_equipo_nuevo
+
+    if 'project' in s_type or es_nuevo_check:
+        project_id = 8
+        stage_id = 260
+        tipo_label = "Instalación Nueva"
+
+    else:
+        es_mod_check = False
+        if 'modernization' in record._fields:
+            es_mod_check = record.modernization
+        elif 'x_studio_modernization' in record._fields:
+            es_mod_check = record.x_studio_modernization
+        
+        if 'mordern' in s_type or 'modern' in s_type or es_mod_check:
+            project_id = 92
+            stage_id = 271
+            tipo_label = "Modernización"
+
+    if project_id and stage_id:
+        nueva_tarea = env['project.task'].create({
+            'name': record.name + ' - ' + tipo_label,
+            'project_id': project_id,
+            'stage_id': stage_id,
+            'user_ids': [(6, 0, [38552])],  # Saraí Martínez García
+            'partner_id': record.partner_id.id,
+            'sale_order_id': record.id,
+            'description': record.note or '',
+        })
+        if nueva_tarea.sale_order_id.id != record.id:
+            nueva_tarea.sudo().write({'sale_order_id': record.id})
+        ]]></field>
+    </record>
+
+    <!-- 16: base.automation id 69 -->
+    <record id="auto_69" model="base.automation">
+        <field name="name">Cambio a oportunidad</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["type","=","opportunity"]]</field>
+        <field name="filter_pre_domain">[["type","=","lead"]]</field>
+    </record>
+    <record id="auto_69_act0" model="ir.actions.server">
+        <field name="name">Cambio a oportunidad</field>
+        <field name="model_id" eval="ref('crm.model_crm_lead')"/>
+        <field name="base_automation_id" eval="ref('auto_69')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="44"/>
+        <field name="activity_date_deadline_range" eval="0"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">generic</field>
+        <field name="activity_user_field_name">user_id</field>
+    </record>
+
+    <!-- 16: base.automation id 68 -->
+    <record id="auto_68" model="base.automation">
+        <field name="name">Cambio a iniciativa</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["type","=","lead"]]</field>
+        <field name="filter_pre_domain">[["type","=","opportunity"]]</field>
+    </record>
+    <record id="auto_68_act0" model="ir.actions.server">
+        <field name="name">Cambio a iniciativa</field>
+        <field name="model_id" eval="ref('crm.model_crm_lead')"/>
+        <field name="base_automation_id" eval="ref('auto_68')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="40"/>
+        <field name="activity_date_deadline_range" eval="0"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">generic</field>
+        <field name="activity_user_field_name">user_id</field>
+    </record>
+
+    <!-- 16: base.automation id 67 -->
+    <record id="auto_67" model="base.automation">
+        <field name="name">Nueva Iniciativa</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[["type","=","lead"]]</field>
+    </record>
+    <record id="auto_67_act0" model="ir.actions.server">
+        <field name="name">Nueva Iniciativa</field>
+        <field name="model_id" eval="ref('crm.model_crm_lead')"/>
+        <field name="base_automation_id" eval="ref('auto_67')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="40"/>
+        <field name="activity_date_deadline_range" eval="0"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="932"/>
+    </record>
+</odoo>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 16: base.automation id 135 -->
+    <record id="auto_135" model="base.automation">
+        <field name="name">Devoluciones: heredar SO de origen del OUT</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[('origin','like','Devoluci'),('picking_type_id.code','=','incoming')]</field>
+    </record>
+    <record id="auto_135_act0" model="ir.actions.server">
+        <field name="name">Devoluciones: heredar SO de origen del OUT</field>
+        <field name="model_id" eval="ref('stock.model_stock_picking')"/>
+        <field name="base_automation_id" eval="ref('auto_135')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for record in records:
+    if record.sale_id or not record.origin:
+        continue
+    tokens = record.origin.replace('(', ' ').replace(')', ' ').split()
+    out_name = False
+    for tok in tokens:
+        if '/OUT/' in tok:
+            out_name = tok
+            break
+    if not out_name:
+        continue
+    out_picking = env['stock.picking'].search([('name', '=', out_name)], limit=1)
+    if out_picking and out_picking.sale_id:
+        record.write({'sale_id': out_picking.sale_id.id})
+        ]]></field>
+    </record>
+
+    <!-- 16: base.automation id 134 -->
+    <record id="auto_134" model="base.automation">
+        <field name="name">Devoluciones: reubicar a almacén de origen real</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="trigger">on_create</field>
+        <field name="active" eval="False"/>
+    </record>
+    <record id="auto_134_act0" model="ir.actions.server">
+        <field name="name">Devoluciones: reubicar a almacén de origen real</field>
+        <field name="model_id" eval="ref('stock.model_stock_move')"/>
+        <field name="base_automation_id" eval="ref('auto_134')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+padre_id = 361
+almacen1_id = 1518
+
+def buscar_hija_real(move, visitados):
+    if move.id in visitados:
+        return {}
+    visitados.add(move.id)
+
+    qty_by_loc = {}
+    for line in move.move_line_ids.filtered(lambda l: l.state == 'done'):
+        loc = line.location_id
+        if loc.id != padre_id and loc.id != almacen1_id and loc.active and loc.usage == 'internal':
+            qty_by_loc[loc] = qty_by_loc.get(loc, 0) + (line.quantity or 0)
+
+    if qty_by_loc:
+        return qty_by_loc
+
+    combinado = {}
+    for orig in move.move_orig_ids:
+        resultado = buscar_hija_real(orig, visitados)
+        for loc, qty in resultado.items():
+            combinado[loc] = combinado.get(loc, 0) + qty
+    return combinado
+
+
+for move in records:
+    try:
+        picking = move.picking_id
+        if not picking or not picking.origin:
+            continue
+        if 'Devolución de' not in picking.origin:
+            continue
+        if not move.move_orig_ids:
+            continue
+        if move.location_dest_id.id != padre_id:
+            continue
+
+        visitados = set()
+        qty_by_loc = {}
+        for orig in move.move_orig_ids:
+            resultado = buscar_hija_real(orig, visitados)
+            for loc, qty in resultado.items():
+                qty_by_loc[loc] = qty_by_loc.get(loc, 0) + qty
+
+        if not qty_by_loc:
+            continue
+
+        hija_correcta = None
+        max_qty = -1
+        for loc, qty in qty_by_loc.items():
+            if qty > max_qty:
+                max_qty = qty
+                hija_correcta = loc
+
+        if hija_correcta:
+            destino_anterior = picking.location_dest_id.display_name if picking.location_dest_id else '?'
+            move.write({'location_dest_id': hija_correcta.id})
+            if picking.location_dest_id.id == padre_id:
+                picking.write({'location_dest_id': hija_correcta.id})
+            log_note = "Auto-corregido destino de devolucion: %s -> %s (move %s, picking %s)" % (
+                destino_anterior, hija_correcta.display_name, move.id, picking.name
+            )
+            picking.message_post(body=log_note)
+    except Exception as e:
+        try:
+            picking.message_post(body="Error en automatizacion de reubicacion de devolucion: %s" % str(e))
+        except Exception:
+            pass
+        ]]></field>
+    </record>
+
+    <!-- 16: base.automation id 123 -->
+    <record id="auto_123" model="base.automation">
+        <field name="name">Recepción contenedores - Validar (Hugo+Diego+César)</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[["picking_type_id","=",36]]</field>
+    </record>
+    <record id="auto_123_act0" model="ir.actions.server">
+        <field name="name">Recepción contenedores - Validar (Hugo+Diego+César) (1)</field>
+        <field name="model_id" eval="ref('stock.model_stock_picking')"/>
+        <field name="base_automation_id" eval="ref('auto_123')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Validar</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">weeks</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="882"/>
+    </record>
+    <record id="auto_123_act2" model="ir.actions.server">
+        <field name="name">Recepción contenedores - Validar (Hugo+Diego+César) (3)</field>
+        <field name="model_id" eval="ref('stock.model_stock_picking')"/>
+        <field name="base_automation_id" eval="ref('auto_123')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Validar</field>
+        <field name="activity_date_deadline_range" eval="1"/>
+        <field name="activity_date_deadline_range_type">weeks</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="35662"/>
+    </record>
+
+    <!-- 16: base.automation id 125 -->
+    <record id="auto_125" model="base.automation">
+        <field name="name">Seguimiento de orden de compra (Martha+Leonel)</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">["|","|","|",["create_uid","=",12],["create_uid","=",1252],["create_uid","=",1936],["create_uid","=",1401]]</field>
+    </record>
+    <record id="auto_125_act0" model="ir.actions.server">
+        <field name="name">Seguimiento de orden de compra (Martha+Leonel) (1)</field>
+        <field name="model_id" eval="ref('purchase.model_purchase_order')"/>
+        <field name="base_automation_id" eval="ref('auto_125')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Seguimiento de orden de compra</field>
+        <field name="activity_date_deadline_range" eval="0"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="1936"/>
+    </record>
+    <record id="auto_125_act1" model="ir.actions.server">
+        <field name="name">Seguimiento de orden de compra (Martha+Leonel) (2)</field>
+        <field name="model_id" eval="ref('purchase.model_purchase_order')"/>
+        <field name="base_automation_id" eval="ref('auto_125')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Seguimiento de orden de compra</field>
+        <field name="activity_date_deadline_range" eval="0"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="22993"/>
+    </record>
+
+    <!-- 16: base.automation id 116 -->
+    <record id="auto_116" model="base.automation">
+        <field name="name">Compra - Analista</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["state","=","purchase"]]</field>
+        <field name="filter_pre_domain">[["create_uid.id","=",1252]]</field>
+    </record>
+    <record id="auto_116_act0" model="ir.actions.server">
+        <field name="name">Compra - Analista</field>
+        <field name="model_id" eval="ref('purchase.model_purchase_order')"/>
+        <field name="base_automation_id" eval="ref('auto_116')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" eval="4"/>
+        <field name="activity_summary">Realizar compra</field>
+        <field name="activity_date_deadline_range" eval="3"/>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">specific</field>
+        <field name="activity_user_id" eval="1936"/>
+    </record>
+
+    <!-- 16: base.automation id 117 -->
+    <record id="auto_117" model="base.automation">
+        <field name="name">Compra - Añadir Analista</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[["state","=","purchase"]]</field>
+        <field name="filter_pre_domain">[["create_uid.id","=",91]]</field>
+    </record>
+    <record id="auto_117_act0" model="ir.actions.server">
+        <field name="name">Compra - Añadir Analista</field>
+        <field name="model_id" eval="ref('purchase.model_purchase_order')"/>
+        <field name="base_automation_id" eval="ref('auto_117')"/>
+        <field name="usage">base_automation</field>
+        <field name="state">followers</field>
+        <field name="followers_type">specific</field>
+        <field name="partner_ids" eval="[(6, 0, [23156])]"/>
+    </record>
+</odoo>
