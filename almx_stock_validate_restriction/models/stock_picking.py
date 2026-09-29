@@ -154,31 +154,8 @@ class StockPicking(models.Model):
                 ))
 
     # ------------------------------------------------------------------
-    # Regla 3: encadenar la OUT al validar el PICK
-    # ------------------------------------------------------------------
-    def _chain_related_out(self):
-        for picking in self.filtered(lambda p: p.picking_type_code == 'internal' and p.state == 'done'):
-            out = picking.related_out_id
-            if not out or out.state in ('done', 'cancel') or out.products_availability_state != 'available':
-                continue
-            try:
-                with self.env.cr.savepoint():
-                    res = out.button_validate()
-                if isinstance(res, dict) or out.state != 'done':
-                    out.message_post(body=_(
-                        "La validación automática desde %(pick)s requiere confirmación "
-                        "manual; valida esta salida directamente.", pick=picking.name))
-            except UserError as e:
-                _logger.info("Auto-validación de %s desde %s no procedió: %s", out.name, picking.name, e)
-                out.message_post(body=_(
-                    "No se pudo validar automáticamente desde %(pick)s: %(err)s",
-                    pick=picking.name, err=str(e)))
-
-    # ------------------------------------------------------------------
     def button_validate(self):
         self._check_pick_before_out()
         self._prevent_negative_stock()
         self._check_not_all_zero()
-        res = super().button_validate()
-        self._chain_related_out()
-        return res
+        return super().button_validate()
