@@ -1,0 +1,81 @@
+# ==========================================
+# Byte-compiled / Python Cache
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ==========================================
+# Entornos Virtuales
+# ==========================================
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ==========================================
+# Configuración y Variables de Entorno
+# ==========================================
+.env
+.env.local
+.env.*.local
+*.env
+*.pem
+*.key
+*.cert
+
+# ==========================================
+# Archivos Temporales y Logs de Odoo / Servidor
+# ==========================================
+*.log
+*.pid
+odoo.conf
+odoo-server.log
+filestore/
+sessions/
+
+# ==========================================
+# Editores e IDEs
+# ==========================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.iws
+*.iml
+*.ipr
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Docker & Bases de Datos Locales
+# ==========================================
+.docker/
+docker-compose.override.yml
+*.sqlite3
+*.db
+*.dump
+
+# ==========================================
+# Node.js / NPM / Yarn (Frontend Assets)
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+
+# ==========================================
+# Pruebas y Cobertura de Código
+# ==========================================
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
