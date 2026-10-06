@@ -316,7 +316,6 @@ class StockPicking(models.Model):
             # Crear los movimientos
             for move in self.move_ids:
                 new_move = self.env['stock.move'].create({
-                    'name': move.name,
                     'product_id': move.product_id.id,
                     'product_uom_qty': move.quantity,
                     'product_uom': move.product_uom.id,
@@ -333,6 +332,7 @@ class StockPicking(models.Model):
                     'location_id': picking_out.location_id.id,
                     'location_dest_id': picking_out.location_dest_id.id,
                     'company_id': self.company_id.id,
+                    'sale_line_id': move.sale_line_id.id,
                 })
                 # ALMX FIX: enlazar de forma NATIVA el movimiento nuevo con
                 # el movimiento del PICK que lo originó (move_orig_ids /
@@ -382,7 +382,6 @@ class StockPicking(models.Model):
             # Crear los movimientos
             for move in self.move_ids:
                 new_move = self.env['stock.move'].create({
-                    'name': move.name,
                     'product_id': move.product_id.id,
                     'product_uom_qty': move.quantity,
                     'product_uom': move.product_uom.id,
@@ -390,6 +389,7 @@ class StockPicking(models.Model):
                     'location_id': move.location_id.id,
                     'location_dest_id': picking_out.location_dest_id.id,
                     'company_id': self.company_id.id,
+                    'sale_line_id': move.sale_line_id.id,
                 })
                 # ALMX FIX: enlace nativo move_orig_ids/move_dest_ids,
                 # mismo motivo que en action_create_related_out.
