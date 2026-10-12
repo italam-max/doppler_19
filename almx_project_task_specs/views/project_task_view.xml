@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_task_form_almx_project_features" model="ir.ui.view">
+        <field name="name">project.task.form.almx.project.features</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="almx_project_features" string="Características del Proyecto"
+                      invisible="not show_project_features">
+                    <field name="show_project_features" invisible="1"/>
+                    <group>
+                        <group string="Configuración general">
+                            <field name="plan_delivery_date"/>
+                            <field name="installation_type"/>
+                            <field name="existing_building" widget="radio" options="{'horizontal': true}"/>
+                            <field name="elevator_model"/>
+                            <field name="group_type"/>
+                            <field name="group_type_other"/>
+                            <field name="applied_standard"/>
+                            <field name="installation" widget="radio" options="{'horizontal': true}"/>
+                        </group>
+                        <group string="Especificaciones técnicas">
+                            <field name="speed"/>
+                            <field name="traction_system"/>
+                            <field name="capacity"/>
+                            <field name="stops_count"/>
+                            <field name="supply_voltage"/>
+                            <field name="supply_type"/>
+                            <field name="counterweight_governor" widget="radio" options="{'horizontal': true}"/>
+                            <field name="control_type"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Cubo y foso">
+                            <field name="shaft_width"/>
+                            <field name="shaft_depth"/>
+                            <field name="pit_depth"/>
+                            <field name="travel"/>
+                            <field name="overhead"/>
+                            <field name="shaft_type"/>
+                            <field name="shaft_construction"/>
+                        </group>
+                        <group string="Puertas y entradas">
+                            <field name="front_rear_floors"/>
+                            <field name="entrance_width"/>
+                            <field name="entrance_height"/>
+                            <field name="cabin_door_finish"/>
+                            <field name="door_fire_resistance"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Cabina y piso">
+                            <field name="cabin_type"/>
+                            <field name="floor_nomenclature"/>
+                            <field name="lop_type"/>
+                            <field name="lop_model"/>
+                            <field name="handrail_type"/>
+                            <field name="floor_height"/>
+                            <field name="floor_type"/>
+                        </group>
+                        <group string="Documentos">
+                            <field name="zoho_url" widget="url"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
