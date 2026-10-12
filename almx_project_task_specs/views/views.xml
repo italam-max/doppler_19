@@ -1,0 +1,60 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+<!--
+    <record model="ir.ui.view" id="almx_project_task_specs.list">
+      <field name="name">almx_project_task_specs list</field>
+      <field name="model">almx_project_task_specs.almx_project_task_specs</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </list>
+      </field>
+    </record>
+-->
+
+    <!-- actions opening views on models -->
+<!--
+    <record model="ir.actions.act_window" id="almx_project_task_specs.action_window">
+      <field name="name">almx_project_task_specs window</field>
+      <field name="res_model">almx_project_task_specs.almx_project_task_specs</field>
+      <field name="view_mode">list,form</field>
+    </record>
+-->
+
+    <!-- server action to the one above -->
+<!--
+    <record model="ir.actions.server" id="almx_project_task_specs.action_server">
+      <field name="name">almx_project_task_specs server</field>
+      <field name="model_id" ref="model_almx_project_task_specs_almx_project_task_specs"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "list,form",
+          "res_model": model._name,
+        }
+      </field>
+    </record>
+-->
+
+    <!-- Top menu item -->
+<!--
+    <menuitem name="almx_project_task_specs" id="almx_project_task_specs.menu_root"/>
+-->
+    <!-- menu categories -->
+<!--
+    <menuitem name="Menu 1" id="almx_project_task_specs.menu_1" parent="almx_project_task_specs.menu_root"/>
+    <menuitem name="Menu 2" id="almx_project_task_specs.menu_2" parent="almx_project_task_specs.menu_root"/>
+-->
+    <!-- actions -->
+<!--
+    <menuitem name="List" id="almx_project_task_specs.menu_1_list" parent="almx_project_task_specs.menu_1"
+              action="almx_project_task_specs.action_window"/>
+    <menuitem name="Server to list" id="almx_project_task_specs" parent="almx_project_task_specs.menu_2"
+              action="almx_project_task_specs.action_server"/>
+-->
+  </data>
+</odoo>
