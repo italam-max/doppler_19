@@ -147,6 +147,10 @@ def upsert(name, vals, Model=None):
     Model = Model if Model is not None else Menu
     rec = ours(name, Model)
     if rec:
+        # 19 valida parent_id en cada escritura y rechaza menús con hijos bajo un submenú
+        # (16 permite 3 niveles). Solo se escribe el padre si de verdad cambió.
+        if "parent_id" in vals and rec.parent_id.id == (vals["parent_id"] or False):
+            vals = {k: v for k, v in vals.items() if k != "parent_id"}
         rec.write(vals)
     else:
         rec = Model.create(vals)
