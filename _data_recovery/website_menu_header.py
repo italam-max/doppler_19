@@ -48,10 +48,15 @@ W = int(os.environ.get("ODOO19_WEBSITE_ID", "1"))
 PHONE_DISPLAY = os.environ.get("PHONE_DISPLAY", "55 5532 2739")
 PHONE_TEL = os.environ.get("PHONE_TEL", "+525555322739")
 PLACEHOLDER = "+1 555-555-5556"
-# Opciones de header/footer que se apagan desactivando su vista (herencias opcionales):
-# buscador del header y la leyenda "El mejor ... de código abierto / Powered by Odoo"
+# Opciones del header que se apagan desactivando su vista (herencias opcionales)
 HEADER_OFF = [k.strip() for k in os.environ.get(
-    "HEADER_OFF", "website.header_search_box,website.brand_promotion").split(",") if k.strip()]
+    "HEADER_OFF", "website.header_search_box").split(",") if k.strip()]
+# Bloques que se quitan con una vista heredada (xpath -> replace vacío) para el website.
+# web.brand_promotion pinta la leyenda "El mejor ... de código abierto / Powered by Odoo"
+# en el footer; website.brand_promotion solo cambia su texto, apagarla no la oculta.
+XPATH_HIDE = {
+    "web.brand_promotion": ("//div[hasclass('o_brand_promotion')]", "brand_promotion"),
+}
 # Plantillas que el header llama con t-call: desactivarlas no las oculta, se fuerza su
 # variable de visibilidad a False con una vista heredada para el website
 HEADER_HIDE = {
@@ -295,6 +300,24 @@ for key, (var, slug) in HEADER_HIDE.items():
                     '<t t-set="%s" t-value="False"/></xpath></data>' % (var, var)),
     }, View)
     log("Oculto en el header: %s" % key)
+
+# Bloques a quitar por xpath (leyenda de Odoo en el footer)
+for key, (xpath, slug) in XPATH_HIDE.items():
+    target = website_view(key)
+    if not target:
+        log("Vista %s no existe, se omite" % key)
+        continue
+    upsert("website%s_hide_%s" % (W, slug), {
+        "name": "Alamex: quitar %s" % slug,
+        "key": "%s.website%s_hide_%s" % (XMOD, W, slug),
+        "type": "qweb",
+        "mode": "extension",
+        "inherit_id": target.id,
+        "website_id": W,
+        "active": True,
+        "arch_db": '<data><xpath expr="%s" position="replace"/></data>' % xpath,
+    }, View)
+    log("Quitado del sitio: %s" % slug)
 
 # Alineación del menú: activa la variante pedida y apaga las otras ("left" = ninguna)
 for align in ("center", "right"):
