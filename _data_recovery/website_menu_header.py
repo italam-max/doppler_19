@@ -21,6 +21,11 @@ Qué hace (idempotente, se puede correr N veces):
      wishlist y centra el menú.
   5. Corrige variables del tema mal convertidas por el upgrade: btn-font-size
      quedó en 0.3125rem (5 px) y hacía ilegible "Iniciar sesión"; se regresa a 1rem.
+  6. Reapunta personalizaciones del editor hechas en 16 cuyo xpath ya no existe en 19
+     (p. ej. el encabezado de /blog, que daba error 500).
+  7. Convierte enlaces absolutos al propio sitio (https://www.alam.mx/...) en menús,
+     mega menús y contenido de páginas a rutas relativas (/...), para que en staging
+     no lleven a producción y no dependan del dominio.
 
 Uso (shell de Odoo.sh, desde la carpeta del repo doppler_19):
   export ODOO16_URL=https://www.alam.mx
@@ -68,6 +73,15 @@ HEADER_HIDE = {
 THEME_VARS = dict(kv.split("=", 1) for kv in os.environ.get(
     "THEME_VARS", "btn-font-size=1rem").split(",") if "=" in kv)
 USER_VALUES_URL = "/website/static/src/scss/options/user_values.scss"
+# Personalizaciones del editor hechas en 16 cuyo xpath ya no existe en las plantillas de 19:
+# la página truena (error 500) porque Odoo no encuentra dónde insertarlas. Se reapuntan al
+# elemento equivalente de 19 conservando el contenido. (clave de vista, xpath 16, xpath 19)
+XPATH_RETARGET = [
+    # /blog: encabezado "Alamex Blog" de la página "Todos los blogs"
+    ("website_blog.blog_post_short_oe_structure_blog_all_header",
+     "//*[hasclass('oe_structure')][@id='oe_structure_blog_all_header']",
+     "//t[@t-elif='blogs']/div[hasclass('oe_structure')]"),
+]
 # Alineación del menú en el header (opción nativa del editor). En 16 va centrado; el
 # upgrade dejó la plantilla "vertical" alineada a la izquierda.
 HEADER_TEMPLATE = os.environ.get("HEADER_TEMPLATE", "vertical")
@@ -79,6 +93,22 @@ MENU_FIELDS = ["name", "url", "parent_id", "sequence", "new_window",
 
 def log(msg):
     print("[website_menu_header] " + msg)
+
+
+# Enlaces absolutos al propio sitio (https://www.alam.mx/blog) -> relativos (/blog), para
+# que funcionen igual en staging y en producción. Solo alam.mx / www.alam.mx; no toca
+# subdominios (dev.alam.mx) ni correos (@alam.mx).
+import re
+SITE_ABS_RE = re.compile(r"https?://(?:www\.)?alam\.mx(?=[/\"'\s)&?#]|$)", re.I)
+
+
+def relativize(text):
+    if not text:
+        return text
+    # "https://www.alam.mx/x" -> "/x" ; "https://www.alam.mx" (sin ruta) -> "/"
+    out = SITE_ABS_RE.sub("", text)
+    out = re.sub(r"(href=|src=)([\"'])(?=[\"'])", r"\1\2/", out)
+    return out
 
 
 # ---------------------------------------------------------------- Odoo 16 RPC
@@ -186,12 +216,12 @@ while pending:
         name = xml_name(m["id"])
         rec = upsert(name, {
             "name": m["name"],
-            "url": m["url"] or "#",
+            "url": relativize(m["url"]) or ("/" if m["url"] else "#"),
             "sequence": m["sequence"],
             "new_window": m["new_window"],
             "website_id": W,
             "parent_id": mapping[parent16].id,
-            "mega_menu_content": m.get("mega_menu_content") or False,
+            "mega_menu_content": relativize(m.get("mega_menu_content")) or False,
             "mega_menu_classes": m.get("mega_menu_classes") or False,
         })
         # Traducciones (solo si difieren del inglés)
@@ -203,7 +233,7 @@ while pending:
             if tr.get("name") and tr["name"] != m["name"]:
                 vals["name"] = tr["name"]
             if tr.get("mega_menu_content") and tr["mega_menu_content"] != m.get("mega_menu_content"):
-                vals["mega_menu_content"] = tr["mega_menu_content"]
+                vals["mega_menu_content"] = relativize(tr["mega_menu_content"])
             if vals:
                 rec.with_context(lang=lang).write(vals)
         mapping[m["id"]] = rec
@@ -318,6 +348,38 @@ for key, (xpath, slug) in XPATH_HIDE.items():
         "arch_db": '<data><xpath expr="%s" position="replace"/></data>' % xpath,
     }, View)
     log("Quitado del sitio: %s" % slug)
+
+# Personalizaciones de 16 con xpath que ya no existe en 19 (páginas con error 500)
+for key, old_xp, new_xp in XPATH_RETARGET:
+    views = View.search([("key", "=", key), ("website_id", "in", [W, False])])
+    if not views:
+        log("Vista %s no existe, se omite" % key)
+        continue
+    for v in views:
+        changed = False
+        # en_US primero: Odoo propaga la estructura a las demás traducciones
+        for lang in ["en_US"] + [l for l in langs19 if l != "en_US"]:
+            arch = v.with_context(lang=lang).arch_db or ""
+            if old_xp in arch:
+                v.with_context(lang=lang).write({"arch_db": arch.replace(old_xp, new_xp)})
+                changed = True
+        log("%s xpath de %s (id %s)" % ("Reapuntado" if changed else "Ya corregido", key, v.id))
+
+# Enlaces absolutos a alam.mx en el contenido de páginas, header y footer -> relativos
+abs_views = View.search([("arch_db", "ilike", "alam.mx"), ("website_id", "in", [W, False])])
+n_views = n_links = 0
+for v in abs_views:
+    touched = False
+    # en_US primero; después se revisa cada idioma por si conserva su propia versión
+    for lang in ["en_US"] + [l for l in langs19 if l != "en_US"]:
+        arch = v.with_context(lang=lang).arch_db or ""
+        new = relativize(arch)
+        if new != arch:
+            n_links += len(SITE_ABS_RE.findall(arch))
+            v.with_context(lang=lang).write({"arch_db": new})
+            touched = True
+    n_views += touched
+log("Enlaces absolutos a alam.mx convertidos a relativos: %s en %s vistas" % (n_links, n_views))
 
 # Alineación del menú: activa la variante pedida y apaga las otras ("left" = ninguna)
 for align in ("center", "right"):
