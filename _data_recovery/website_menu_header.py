@@ -101,7 +101,9 @@ log("16: website '%s' (id %s), menú raíz %s" % (site16["name"], site16["id"], 
 
 by_lang = {}
 for lang in {"en_US", *langs19}:
-    rows = call16("website.menu", "search_read", [[("id", "child_of", root16)]],
+    # child_of en 16 también trae menús de otros sitios/genéricos: filtrar por website
+    rows = call16("website.menu", "search_read",
+                  [[("id", "child_of", root16), ("website_id", "=", site16["id"])]],
                   fields=MENU_FIELDS, context={"lang": lang})
     by_lang[lang] = {r["id"]: r for r in rows}
 menus16 = by_lang["en_US"]
@@ -215,10 +217,16 @@ def write_for_website(view, vals, lang="en_US"):
     view.with_context(website_id=W, lang=lang).write(vals)
 
 
-# Teléfono
+# Teléfono: solo vistas activas que se ven en el sitio (header, footer, contacto).
+# Se excluyen plantillas inactivas (variantes de footer) y snippets "website.s_*",
+# que son la plantilla de bloques nuevos, no contenido publicado.
 phone_keys = set(View.search([("arch_db", "ilike", PLACEHOLDER),
-                              ("website_id", "in", [W, False])]).mapped("key"))
-for key in phone_keys:
+                              ("website_id", "in", [W, False]),
+                              ("active", "=", True)]).mapped("key"))
+phone_keys = {k for k in phone_keys if k and not k.startswith("website.s_")}
+for key in sorted(phone_keys):
+    if not website_view(key).active:
+        continue
     for lang in ["en_US"] + [l for l in langs19 if l != "en_US"]:
         v = website_view(key)
         arch = v.with_context(lang=lang).arch_db or ""
