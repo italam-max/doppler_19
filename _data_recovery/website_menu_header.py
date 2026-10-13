@@ -17,7 +17,8 @@ Qué hace (idempotente, se puede correr N veces):
      __data_recovery__.website<W>_menu_<id16>; en cada corrida se actualizan
      y se borran los que ya no existan en 16. No toca ningún otro menú.
   3. Reemplaza el teléfono de ejemplo por el real (solo vistas activas visibles).
-  4. Apaga el buscador, oculta carrito y wishlist y centra el menú (paridad con 16).
+  4. Apaga el buscador y la leyenda "Powered by Odoo" del footer, oculta carrito y
+     wishlist y centra el menú.
   5. Corrige variables del tema mal convertidas por el upgrade: btn-font-size
      quedó en 0.3125rem (5 px) y hacía ilegible "Iniciar sesión"; se regresa a 1rem.
 
@@ -47,9 +48,10 @@ W = int(os.environ.get("ODOO19_WEBSITE_ID", "1"))
 PHONE_DISPLAY = os.environ.get("PHONE_DISPLAY", "55 5532 2739")
 PHONE_TEL = os.environ.get("PHONE_TEL", "+525555322739")
 PLACEHOLDER = "+1 555-555-5556"
-# Opciones del header que sí se apagan desactivando su vista (son herencias opcionales)
+# Opciones de header/footer que se apagan desactivando su vista (herencias opcionales):
+# buscador del header y la leyenda "El mejor ... de código abierto / Powered by Odoo"
 HEADER_OFF = [k.strip() for k in os.environ.get(
-    "HEADER_OFF", "website.header_search_box").split(",") if k.strip()]
+    "HEADER_OFF", "website.header_search_box,website.brand_promotion").split(",") if k.strip()]
 # Plantillas que el header llama con t-call: desactivarlas no las oculta, se fuerza su
 # variable de visibilidad a False con una vista heredada para el website
 HEADER_HIDE = {
