@@ -64,8 +64,10 @@ def log(msg):
 def _rpc(service, method, *args):
     payload = {"jsonrpc": "2.0", "method": "call", "id": 1,
                "params": {"service": service, "method": method, "args": list(args)}}
+    # Cloudflare (alam.mx) responde 403 al User-Agent por defecto "Python-urllib"
     req = urllib.request.Request(URL16 + "/jsonrpc", data=json.dumps(payload).encode(),
-                                 headers={"Content-Type": "application/json"})
+                                 headers={"Content-Type": "application/json",
+                                          "User-Agent": "Alamex-DataRecovery/1.0"})
     with urllib.request.urlopen(req, timeout=120) as resp:
         res = json.loads(resp.read())
     if res.get("error"):
