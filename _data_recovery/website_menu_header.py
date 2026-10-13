@@ -17,7 +17,7 @@ Qué hace (idempotente, se puede correr N veces):
      __data_recovery__.website<W>_menu_<id16>; en cada corrida se actualizan
      y se borran los que ya no existan en 16. No toca ningún otro menú.
   3. Reemplaza el teléfono de ejemplo por el real (solo vistas activas visibles).
-  4. Apaga el buscador y oculta carrito y wishlist del encabezado (paridad con 16).
+  4. Apaga el buscador, oculta carrito y wishlist y centra el menú (paridad con 16).
   5. Corrige variables del tema mal convertidas por el upgrade: btn-font-size
      quedó en 0.3125rem (5 px) y hacía ilegible "Iniciar sesión"; se regresa a 1rem.
 
@@ -61,6 +61,10 @@ HEADER_HIDE = {
 THEME_VARS = dict(kv.split("=", 1) for kv in os.environ.get(
     "THEME_VARS", "btn-font-size=1rem").split(",") if "=" in kv)
 USER_VALUES_URL = "/website/static/src/scss/options/user_values.scss"
+# Alineación del menú en el header (opción nativa del editor). En 16 va centrado; el
+# upgrade dejó la plantilla "vertical" alineada a la izquierda.
+HEADER_TEMPLATE = os.environ.get("HEADER_TEMPLATE", "vertical")
+HEADER_ALIGN = os.environ.get("HEADER_ALIGN", "center")  # left | center | right
 XMOD = "__data_recovery__"
 MENU_FIELDS = ["name", "url", "parent_id", "sequence", "new_window",
                "mega_menu_content", "mega_menu_classes"]
@@ -289,6 +293,20 @@ for key, (var, slug) in HEADER_HIDE.items():
                     '<t t-set="%s" t-value="False"/></xpath></data>' % (var, var)),
     }, View)
     log("Oculto en el header: %s" % key)
+
+# Alineación del menú: activa la variante pedida y apaga las otras ("left" = ninguna)
+for align in ("center", "right"):
+    key = "website.template_header_%s_align_%s" % (HEADER_TEMPLATE, align)
+    v = website_view(key)
+    if not v:
+        if align == HEADER_ALIGN:
+            log("AVISO: no existe %s, la alineación no se cambió" % key)
+        continue
+    want = align == HEADER_ALIGN
+    if v.active != want:
+        write_for_website(v, {"active": want})
+    if want:
+        log("Menú del header alineado: %s (%s)" % (align, key))
 
 # ------------------------------------------------------ 3. Variables del tema
 if THEME_VARS:
