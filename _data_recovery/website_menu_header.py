@@ -16,8 +16,10 @@ Qué hace (idempotente, se puede correr N veces):
      principal. Los registros que crea se marcan con xmlid
      __data_recovery__.website<W>_menu_<id16>; en cada corrida se actualizan
      y se borran los que ya no existan en 16. No toca ningún otro menú.
-  3. Reemplaza el teléfono de ejemplo por el real.
-  4. Apaga en el encabezado: carrito, wishlist y buscador (paridad con 16).
+  3. Reemplaza el teléfono de ejemplo por el real (solo vistas activas visibles).
+  4. Apaga el buscador y oculta carrito y wishlist del encabezado (paridad con 16).
+  5. Corrige variables del tema mal convertidas por el upgrade: btn-font-size
+     quedó en 0.3125rem (5 px) y hacía ilegible "Iniciar sesión"; se regresa a 1rem.
 
 Uso (shell de Odoo.sh, desde la carpeta del repo doppler_19):
   export ODOO16_URL=https://www.alam.mx
@@ -45,12 +47,20 @@ W = int(os.environ.get("ODOO19_WEBSITE_ID", "1"))
 PHONE_DISPLAY = os.environ.get("PHONE_DISPLAY", "55 5532 2739")
 PHONE_TEL = os.environ.get("PHONE_TEL", "+525555322739")
 PLACEHOLDER = "+1 555-555-5556"
+# Opciones del header que sí se apagan desactivando su vista (son herencias opcionales)
 HEADER_OFF = [k.strip() for k in os.environ.get(
-    "HEADER_OFF",
-    "website_sale.header_cart_link,"
-    "website_sale_wishlist.header_wishlist_link,"
-    "website.header_search_box",
-).split(",") if k.strip()]
+    "HEADER_OFF", "website.header_search_box").split(",") if k.strip()]
+# Plantillas que el header llama con t-call: desactivarlas no las oculta, se fuerza su
+# variable de visibilidad a False con una vista heredada para el website
+HEADER_HIDE = {
+    "website_sale.header_cart_link": ("show_cart", "cart"),
+    "website_sale_wishlist.header_wishlist_link": ("show_wishes", "wishlist"),
+}
+# Variables del tema que el upgrade convirtió mal (16 -> 19). btn-font-size quedó en
+# 0.3125rem (5 px) y dejaba "Iniciar sesión" ilegible; en 16 es 1rem.
+THEME_VARS = dict(kv.split("=", 1) for kv in os.environ.get(
+    "THEME_VARS", "btn-font-size=1rem").split(",") if "=" in kv)
+USER_VALUES_URL = "/website/static/src/scss/options/user_values.scss"
 XMOD = "__data_recovery__"
 MENU_FIELDS = ["name", "url", "parent_id", "sequence", "new_window",
                "mega_menu_content", "mega_menu_classes"]
@@ -118,26 +128,28 @@ def xml_name(suffix):
     return "website%s_menu_%s" % (W, suffix)
 
 
-def ours(name):
+def ours(name, Model=None):
+    Model = Model if Model is not None else Menu
     imd = IMD.search([("module", "=", XMOD), ("name", "=", name)], limit=1)
-    return Menu.browse(imd.res_id).exists() if imd else Menu.browse()
+    return Model.browse(imd.res_id).exists() if imd else Model.browse()
 
 
 def mark(name, rec):
     imd = IMD.search([("module", "=", XMOD), ("name", "=", name)], limit=1)
     if imd:
-        imd.res_id = rec.id
+        imd.write({"res_id": rec.id, "model": rec._name})
     else:
-        IMD.create({"module": XMOD, "name": name, "model": "website.menu",
+        IMD.create({"module": XMOD, "name": name, "model": rec._name,
                     "res_id": rec.id, "noupdate": True})
 
 
-def upsert(name, vals):
-    rec = ours(name)
+def upsert(name, vals, Model=None):
+    Model = Model if Model is not None else Menu
+    rec = ours(name, Model)
     if rec:
         rec.write(vals)
     else:
-        rec = Menu.create(vals)
+        rec = Model.create(vals)
         mark(name, rec)
     return rec
 
@@ -245,6 +257,37 @@ for key in HEADER_OFF:
     elif v.active or not v.website_id:
         write_for_website(v, {"active": False})
         log("Apagada en el header: %s" % key)
+
+# Carrito y wishlist: vista heredada website-specific que fuerza la visibilidad a False
+for key, (var, slug) in HEADER_HIDE.items():
+    generic = View.search([("key", "=", key), ("website_id", "=", False)], limit=1)
+    if not generic:
+        log("Vista %s no existe, se omite" % key)
+        continue
+    # Copias website-specific inactivas que dejaba una versión previa de este script
+    leftovers = View.search([("key", "=", key), ("website_id", "=", W),
+                             ("active", "=", False), ("inherit_id", "=", False)])
+    if leftovers:
+        leftovers.unlink()
+        log("Eliminadas copias inactivas previas de %s: %s" % (key, leftovers.ids))
+    upsert("website%s_hide_%s" % (W, slug), {
+        "name": "Alamex: ocultar %s en header" % slug,
+        "key": "%s.website%s_hide_%s" % (XMOD, W, slug),
+        "type": "qweb",
+        "mode": "extension",
+        "inherit_id": generic.id,
+        "website_id": W,
+        "active": True,
+        "arch_db": ('<data><xpath expr="//t[@t-set=\'%s\']" position="after">'
+                    '<t t-set="%s" t-value="False"/></xpath></data>' % (var, var)),
+    }, View)
+    log("Oculto en el header: %s" % key)
+
+# ------------------------------------------------------ 3. Variables del tema
+if THEME_VARS:
+    env["website.assets"].with_context(website_id=W).make_scss_customization(
+        USER_VALUES_URL, THEME_VARS)
+    log("Variables de tema aplicadas: %s" % THEME_VARS)
 
 # ---------------------------------------------------------------- Verificación
 env.registry.clear_cache()
