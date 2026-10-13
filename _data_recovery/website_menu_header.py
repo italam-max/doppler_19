@@ -243,6 +243,7 @@ phone_keys = {k for k in phone_keys if k and not k.startswith("website.s_")}
 for key in sorted(phone_keys):
     if not website_view(key).active:
         continue
+    changed = False
     for lang in ["en_US"] + [l for l in langs19 if l != "en_US"]:
         v = website_view(key)
         arch = v.with_context(lang=lang).arch_db or ""
@@ -251,7 +252,9 @@ for key in sorted(phone_keys):
         new = (arch.replace("tel:" + PLACEHOLDER, "tel:" + PHONE_TEL)
                    .replace(PLACEHOLDER, PHONE_DISPLAY))
         write_for_website(v, {"arch_db": new}, lang)
-    log("Teléfono actualizado en vista %s" % key)
+        changed = True
+    if changed:
+        log("Teléfono actualizado en vista %s" % key)
 
 # Elementos del header que no se usan
 for key in HEADER_OFF:
@@ -264,22 +267,22 @@ for key in HEADER_OFF:
 
 # Carrito y wishlist: vista heredada website-specific que fuerza la visibilidad a False
 for key, (var, slug) in HEADER_HIDE.items():
-    generic = View.search([("key", "=", key), ("website_id", "=", False)], limit=1)
-    if not generic:
+    # La vista que se renderiza para el website: su copia propia si existe, si no la genérica
+    target = website_view(key)
+    if not target:
         log("Vista %s no existe, se omite" % key)
         continue
-    # Copias website-specific inactivas que dejaba una versión previa de este script
-    leftovers = View.search([("key", "=", key), ("website_id", "=", W),
-                             ("active", "=", False), ("inherit_id", "=", False)])
-    if leftovers:
-        leftovers.unlink()
-        log("Eliminadas copias inactivas previas de %s: %s" % (key, leftovers.ids))
+    # Una versión previa de este script desactivaba la copia del website; no se puede
+    # borrar (tiene vistas hijas), así que se reactiva para dejarla como estaba
+    if not target.active:
+        target.write({"active": True})
+        log("Reactivada copia previa de %s (id %s)" % (key, target.id))
     upsert("website%s_hide_%s" % (W, slug), {
         "name": "Alamex: ocultar %s en header" % slug,
         "key": "%s.website%s_hide_%s" % (XMOD, W, slug),
         "type": "qweb",
         "mode": "extension",
-        "inherit_id": generic.id,
+        "inherit_id": target.id,
         "website_id": W,
         "active": True,
         "arch_db": ('<data><xpath expr="//t[@t-set=\'%s\']" position="after">'
