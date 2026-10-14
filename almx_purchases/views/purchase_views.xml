@@ -8,6 +8,11 @@
             <field name="partner_ref" position="after">
                 <field name="almx_is_import" readonly="state in ('done', 'cancel')"/>
             </field>
+
+            <xpath expr="(//field[@name='currency_id'])[1]" position="after">
+                <xpath expr="//field[@name='incoterm_id']" position="move"/>
+                <xpath expr="//field[@name='incoterm_location']" position="move"/>
+            </xpath>
         </field>
     </record>
 </odoo>
