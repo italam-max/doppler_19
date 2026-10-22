@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_groups_privilege_lunch_price" model="res.groups.privilege">
+        <field name="name">Precios de almuerzo</field>
+        <field name="sequence">17</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+    </record>
+
+    <record id="group_lunch_price_editor" model="res.groups">
+        <field name="name">Editor de precios de almuerzo</field>
+        <field name="comment">Puede editar el precio en Almuerzo &gt; Gerente &gt; Control de proveedores.</field>
+        <field name="privilege_id" ref="res_groups_privilege_lunch_price"/>
+        <!-- Necesita ser gerente de almuerzo para ver el menú Control de proveedores -->
+        <field name="implied_ids" eval="[(4, ref('lunch.group_lunch_manager'))]"/>
+        <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>
