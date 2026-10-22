@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Lista propia (primaria) para no afectar las demás pantallas de pedidos -->
+    <record id="lunch_order_view_list_control_suppliers_price" model="ir.ui.view">
+        <field name="name">lunch.order.list.control.suppliers.price</field>
+        <field name="model">lunch.order</field>
+        <field name="inherit_id" ref="lunch.lunch_order_view_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="edit">1</attribute>
+                <attribute name="editable">bottom</attribute>
+                <attribute name="js_class">almx_lunch_price_list</attribute>
+            </xpath>
+            <!-- Solo el precio es editable; el resto de columnas queda de solo lectura -->
+            <field name="date" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <field name="supplier_id" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <field name="product_id" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <field name="display_toppings" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <field name="note" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <field name="user_id" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <field name="lunch_location_id" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <field name="state" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <field name="price" position="attributes">
+                <attribute name="readonly">not can_edit_price</attribute>
+            </field>
+            <field name="price" position="after">
+                <field name="can_edit_price" column_invisible="1"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Usar esa lista solo en la acción "Control de proveedores" -->
+    <record id="lunch_order_action_control_suppliers_view_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="lunch_order_view_list_control_suppliers_price"/>
+        <field name="act_window_id" ref="lunch.lunch_order_action_control_suppliers"/>
+    </record>
+</odoo>
