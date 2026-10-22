@@ -20,6 +20,7 @@ instalado:
     psql -v ON_ERROR_STOP=1 -f 01_aprobaciones.sql
     psql -v ON_ERROR_STOP=1 -f 02_candidatos_notas.sql
     psql -v ON_ERROR_STOP=1 -f 03_empleados_sat.sql
+    psql -v ON_ERROR_STOP=1 -f 04_tareas_guias.sql
 
 Los SQL con datos personales (03) NO se suben al repo: van en .gitignore.
 """
@@ -187,9 +188,22 @@ def empleados():
     write('03_empleados_sat.sql', lines)
 
 
+# ---------------------------------------------------------------------------
+# 04 Proyectos: end_guides de almx_project (16), deprecado en 19
+# ---------------------------------------------------------------------------
+def tareas():
+    lines = ['-- Guías terminadas (referencia): project.task.end_guides (almx_project 16)']
+    tasks = search_read('project.task', [('end_guides', '!=', False)], ['end_guides'])
+    for t in tasks:
+        lines.append(f"UPDATE project_task SET end_guides = {lit(t['end_guides'])} WHERE id = {t['id']};")
+    print(f'Tareas: {len(tasks)} con guías terminadas')
+    write('04_tareas_guias.sql', lines)
+
+
 if __name__ == '__main__':
     print(f'Leyendo de {URL} ({DB})…')
     aprobaciones()
     candidatos()
     empleados()
+    tareas()
     print('Listo.')

@@ -10,7 +10,7 @@ Ajustes detectados en la validación por áreas (oct 2026):
 * Tiempo personal: doble aprobación obligatoria en dos pasos, respaldo de RH,
   sin autoaprobación y tipos restringidos para empleados.
 * Soporte: cada usuario ve solo sus tickets; grupo para ver todas las mesas.
-* Almuerzos: precio editable en la lista de pedidos para el responsable.
+* Proyectos: secciones Fechas y estatus y Documentos de la tarea (almx_project).
 * Reclutamiento: método de la plantilla Job Offer y formulario de postulación.
 * Empleados: fechas de ingreso / salida / motivo y datos SAT-IMSS de consulta.
     """,
@@ -19,6 +19,7 @@ Ajustes detectados en la validación por áreas (oct 2026):
     'license': 'LGPL-3',
     'depends': [
         'hr',
+        'project',
         'approvals',
         'hr_holidays',
         'helpdesk',
@@ -32,8 +33,8 @@ Ajustes detectados en la validación por áreas (oct 2026):
         'security/rules.xml',
         'views/approval_views.xml',
         'views/hr_leave_views.xml',
-        'views/lunch_views.xml',
         'views/hr_employee_views.xml',
+        'views/project_task_views.xml',
     ],
     'post_init_hook': 'post_init_hook',
     'installable': True,
