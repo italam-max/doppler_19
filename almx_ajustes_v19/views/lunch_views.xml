@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Como en 16 (Studio): lista de pedidos editable en línea con el precio
+         desbloqueado. Solo aplica al Responsable de almuerzos para que los
+         empleados no puedan cambiar el precio de sus propios pedidos. -->
+    <record id="lunch_order_view_tree_almx" model="ir.ui.view">
+        <field name="name">lunch.order.list.almx</field>
+        <field name="model">lunch.order</field>
+        <field name="inherit_id" ref="lunch.lunch_order_view_tree"/>
+        <field name="group_ids" eval="[(4, ref('lunch.group_lunch_manager'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="/list" position="attributes">
+                <attribute name="edit">1</attribute>
+                <attribute name="editable">top</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="replace">
+                <field name="create_date" optional="show"/>
+                <field name="date" readonly="state != 'new'" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='price']" position="attributes">
+                <attribute name="readonly">False</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

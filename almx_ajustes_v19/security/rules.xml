@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===================== Aprobaciones ===================== -->
+    <record id="rule_approval_request_responsible" model="ir.rule">
+        <field name="name">Aprobaciones: el responsable ve sus solicitudes</field>
+        <field name="model_id" ref="approvals.model_approval_request"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('responsible_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_approval_category_read_groups" model="ir.rule">
+        <field name="name">Aprobaciones: categorías por grupos de lectura</field>
+        <field name="model_id" ref="approvals.model_approval_category"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">['|', ('read_group_ids', 'in', user.all_group_ids.ids), ('read_group_ids', '=', False)]</field>
+    </record>
+
+    <!-- ======================== Soporte ======================== -->
+    <!-- La regla nativa de 19 abre a cualquier usuario interno todos los tickets
+         de las mesas que no son "solo invitados". Se regresa al criterio de 16:
+         solo tickets propios (creados como cliente, asignados o como seguidor).
+         La regla nativa tiene noupdate, así que el cambio no se pierde al
+         actualizar helpdesk. -->
+    <record id="helpdesk.helpdesk_ticket_user_rule" model="ir.rule">
+        <field name="name">Helpdesk Ticket User (Alamex: solo tickets propios)</field>
+        <field name="domain_force">['|', '|',
+            ('user_id', '=', user.id),
+            ('partner_id', '=', user.partner_id.id),
+            ('message_partner_ids', 'in', [user.partner_id.id])]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_helpdesk_ticket_all_teams" model="ir.rule">
+        <field name="name">Soporte: ver todas las mesas</field>
+        <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
+        <field name="groups" eval="[(4, ref('group_helpdesk_all_teams'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

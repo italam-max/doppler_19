@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Soporte: IT, Calidad y Dirección ven los tickets de todas las mesas -->
+    <record id="group_helpdesk_all_teams" model="res.groups">
+        <field name="name">Soporte: ver todas las mesas</field>
+        <field name="implied_ids" eval="[(4, ref('helpdesk.group_helpdesk_user'))]"/>
+        <field name="comment">IT, Calidad y Dirección. El resto solo ve sus propios tickets.</field>
+    </record>
+
+    <!-- Tiempo personal: RH, IT y Dirección pueden usar todos los tipos -->
+    <record id="group_leave_all_types" model="res.groups">
+        <field name="name">Tiempo personal: todos los tipos</field>
+        <field name="comment">Pueden registrar cualquier tipo de tiempo personal, incluidos los marcados "Solo RH".</field>
+    </record>
+</odoo>
