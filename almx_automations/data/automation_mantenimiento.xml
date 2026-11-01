@@ -56,7 +56,7 @@ for request in records:
         <field name="state">code</field>
         <field name="code"><![CDATA[
 # 16 era "Actualizar registro" (técnico + tipo preventivo); en 19 se hace con código.
-records.write({'user_id': 38525, 'maintenance_type': 'preventive'})
+records.write({'user_id': 38587, 'maintenance_type': 'preventive'})  # 38587 = saul.m (antes jorge.d, inactivo)
         ]]></field>
     </record>
 </odoo>
