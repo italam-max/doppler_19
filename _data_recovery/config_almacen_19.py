@@ -15,6 +15,8 @@ Decisiones (1-nov-2026):
   - Solo Dirección: Merma, Stock Laboratorio, Banco de Pruebas, LABORATORIO CONSUMO,
     Descarte y Desecho, WHTL/Scrap (incluye sububicaciones)
   - Asignación de equipo: pendiente, no se configura
+  - Puede validar pickings (NWH) (botón Validar en todos los traslados): quienes validaban
+    traslados en 16 en los últimos 60 días al cierre y siguen activos
 
 Idempotente. Uso (shell de Odoo.sh, desde la carpeta del repo):
   DRY_RUN=1 odoo-bin shell --no-http < _data_recovery/config_almacen_19.py
@@ -57,6 +59,18 @@ for lid, key in LOCS:
     if changed and not DRY:
         loc.almx_requires_direction = True
     ok.append('Dirección: %s (%s)' % (loc.complete_name, 'activada' if changed else 'sin cambios'))
+
+VALIDADORES = ['cesar.m', 'hugo.a', 'yazan', 'saul.m', 'angel.a', 'alexis.a', 'berenice.s', 'hamdi']
+grp = env.ref('almx_stock.group_can_validate_picking_doppler')
+for lg in VALIDADORES:
+    u = env['res.users'].search([('login', '=', lg + '@alam.mx')], limit=1)
+    if not u:
+        warn.append('usuario no encontrado: %s' % lg)
+        continue
+    added = u not in grp.user_ids
+    if added and not DRY:
+        grp.write({'user_ids': [(4, u.id)]})
+    ok.append('Puede validar pickings (NWH): %s (%s)' % (lg, 'agregado' if added else 'sin cambios'))
 
 if DRY:
     env.cr.rollback()

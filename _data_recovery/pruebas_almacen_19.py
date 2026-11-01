@@ -50,7 +50,7 @@ def user(*logins):
 
 
 DIR = env.ref('almx_stock_movement_guard.group_direccion').user_ids
-alm = user('entregas', 'leonel.j')
+alm = user('cesar.m', 'entregas')
 hamdi = user('hamdi')
 wh = env['stock.warehouse'].search([('code', '=', 'WHTl')], limit=1)
 
@@ -140,7 +140,7 @@ else:
 
 # --- Vista y datos ---
 def buttons():
-    arch = env['stock.picking'].get_views([(False, 'form')])['views']['form']['arch']
+    arch = env['stock.picking'].with_user(alm).get_views([(False, 'form')])['views']['form']['arch']
     return re.findall(r'<button[^>]*name="button_validate"[^>]*>', arch)
 
 
