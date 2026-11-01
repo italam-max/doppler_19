@@ -1001,6 +1001,15 @@ DATA = {
  ]
 }
 
+# Menús de 16 que en 19 cambiaron de xmlid: se ocultan sus equivalentes.
+ALIAS = {
+    'account_accountant.menu_accounting': ['accountant.menu_accounting'],
+    'hr_attendance.menu_hr_attendance_attendances_overview': ['hr_attendance.menu_hr_attendance_overview'],
+    'hr_attendance.menu_hr_attendance_view_attendances': ['hr_attendance.menu_hr_attendance_view_attendances_management'],
+    'hr_attendance.menu_hr_attendance_kiosk_no_user_mode': ['hr_attendance.menu_action_open_form'],
+    'hr_attendance.menu_hr_attendance_report': ['hr_attendance.menu_hr_attendance_reporting'],
+}
+
 Users = env['res.users'].with_context(active_test=False)
 n_users = n_links = 0
 missing_users, missing_menus = [], set()
@@ -1014,6 +1023,12 @@ for login, xmlids in DATA.items():
         menu = env.ref(xmlid, raise_if_not_found=False)
         if menu and menu._name == 'ir.ui.menu':
             menus |= menu
+            continue
+        alias = [env.ref(x, raise_if_not_found=False) for x in ALIAS.get(xmlid, [])]
+        alias = [m for m in alias if m and m._name == 'ir.ui.menu']
+        if alias:
+            for m in alias:
+                menus |= m
         else:
             missing_menus.add(xmlid)
     new = menus - user.hide_menu_access_ids
