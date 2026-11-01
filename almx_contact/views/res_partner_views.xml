@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <!-- En 16 anclaba en l10n_mx_edi_curp, que en 19 no está en la vista base -->
             <field name="vat" position="after">
-                <field name="x_studio_categoria_comercial" required="1"/>
+                <field name="x_studio_categoria_comercial"/>
             </field>
         </field>
     </record>
