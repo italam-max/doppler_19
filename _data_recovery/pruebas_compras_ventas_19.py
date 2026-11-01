@@ -63,8 +63,8 @@ run('02 Crear producto (%s, grupo alta)' % crea.login, lambda: env['product.temp
     {'name': 'PRUEBA 19 NO USAR'}).id, lambda r: bool(r))
 
 # --- Precio de venta ---
-tmpl = env['product.template'].search([('sale_ok', '=', True), ('list_price', '>', 0),
-                                      ('product_variant_count', '=', 1)], order='id desc', limit=1)
+tmpl = env['product.template'].search([('sale_ok', '=', True), ('list_price', '>', 0)],
+                                     order='id desc', limit=200).filtered(lambda t: t.product_variant_count == 1)[:1]
 run('03 Cambiar precio (vendedor)', lambda: tmpl.with_user(vend).write({'list_price': tmpl.list_price + 1}),
     'No tienes permiso para modificar el Precio de venta')
 
