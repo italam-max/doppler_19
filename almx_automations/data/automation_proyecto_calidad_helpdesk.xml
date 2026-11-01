@@ -102,7 +102,7 @@
         <field name="activity_date_deadline_range" eval="1"/>
         <field name="activity_date_deadline_range_type">days</field>
         <field name="activity_user_type">specific</field>
-        <field name="activity_user_id" eval="38525"/>
+        <field name="activity_user_id" eval="38587"/>
     </record>
 
     <!-- 16: base.automation id 89 -->
@@ -271,7 +271,7 @@ for message in records:
         <field name="usage">base_automation</field>
         <field name="state">followers</field>
         <field name="followers_type">specific</field>
-        <field name="partner_ids" eval="[(6, 0, [18158, 20290, 14067, 13131, 16162, 24856])]"/>
+        <field name="partner_ids" eval="[(6, 0, [23157, 22619])]"/>
     </record>
 
     <!-- 16: base.automation id 137 -->
