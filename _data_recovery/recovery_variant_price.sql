@@ -1,8 +1,10 @@
 -- Recuperación de precios independientes por variante (almx_variant_price 16 -> almx_pricelock 19).
--- Origen: product.product.variant_price en producción 16 (93 variantes, extraído 2026-09-23).
+-- Origen: product.product.variant_price en producción 16 (99 variantes, extraído al cierre del 30-oct-2026).
 -- Correr DESPUÉS de instalar almx_pricelock 19.0.2.0.0 (crea la columna variant_price).
 -- Solo actualiza si la variante existe y pertenece a la misma plantilla que en 16.
 BEGIN;
+UPDATE product_product SET variant_price = 5000 WHERE id = 617 AND product_tmpl_id = 186;
+UPDATE product_product SET variant_price = 4500 WHERE id = 1509 AND product_tmpl_id = 688;
 UPDATE product_product SET variant_price = 43000 WHERE id = 327047 AND product_tmpl_id = 8801;
 UPDATE product_product SET variant_price = 11458.65 WHERE id = 328025 AND product_tmpl_id = 9074;
 UPDATE product_product SET variant_price = 11458.65 WHERE id = 328026 AND product_tmpl_id = 9074;
@@ -21,6 +23,9 @@ UPDATE product_product SET variant_price = 12429.72 WHERE id = 335386 AND produc
 UPDATE product_product SET variant_price = 6000 WHERE id = 335387 AND product_tmpl_id = 9074;
 UPDATE product_product SET variant_price = 6000 WHERE id = 335388 AND product_tmpl_id = 9074;
 UPDATE product_product SET variant_price = 6000 WHERE id = 335389 AND product_tmpl_id = 9074;
+UPDATE product_product SET variant_price = 12000 WHERE id = 335392 AND product_tmpl_id = 9074;
+UPDATE product_product SET variant_price = 13500 WHERE id = 335395 AND product_tmpl_id = 9074;
+UPDATE product_product SET variant_price = 15500 WHERE id = 335404 AND product_tmpl_id = 9074;
 UPDATE product_product SET variant_price = 14500 WHERE id = 335412 AND product_tmpl_id = 13278;
 UPDATE product_product SET variant_price = 15500 WHERE id = 335413 AND product_tmpl_id = 13278;
 UPDATE product_product SET variant_price = 14500 WHERE id = 335425 AND product_tmpl_id = 13278;
@@ -39,6 +44,7 @@ UPDATE product_product SET variant_price = 15500 WHERE id = 335472 AND product_t
 UPDATE product_product SET variant_price = 62148.59 WHERE id = 335477 AND product_tmpl_id = 13278;
 UPDATE product_product SET variant_price = 5300 WHERE id = 335760 AND product_tmpl_id = 13283;
 UPDATE product_product SET variant_price = 6000 WHERE id = 335784 AND product_tmpl_id = 13283;
+UPDATE product_product SET variant_price = 11700 WHERE id = 335785 AND product_tmpl_id = 13283;
 UPDATE product_product SET variant_price = 14500 WHERE id = 335806 AND product_tmpl_id = 13284;
 UPDATE product_product SET variant_price = 15500 WHERE id = 335807 AND product_tmpl_id = 13284;
 UPDATE product_product SET variant_price = 19421.44 WHERE id = 335827 AND product_tmpl_id = 13284;
