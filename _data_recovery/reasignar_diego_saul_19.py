@@ -54,7 +54,9 @@ Emp = env['hr.employee']
 put('3a Aprobador de ausencias de empleados', Emp.search([('leave_manager_id', '=', diego.id)]), {'leave_manager_id': saul.id})
 put('3b Aprobador de gastos de empleados', Emp.search([('expense_manager_id', '=', diego.id)]), {'expense_manager_id': saul.id})
 
-acts = env['ir.actions.server'].search([('activity_user_id', '=', diego.id)])
+# El ORM no las encuentra por búsqueda (usuario inactivo); se ubican por SQL.
+env.cr.execute('SELECT id FROM ir_act_server WHERE activity_user_id = %s', [diego.id])
+acts = env['ir.actions.server'].browse([r[0] for r in env.cr.fetchall()])
 out.append('%-58s %d' % ('4 Acciones automatizadas que asignan actividad', len(acts)))
 if not DRY:
     for a in acts:
