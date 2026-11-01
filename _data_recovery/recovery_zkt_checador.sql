@@ -1,0 +1,87 @@
+-- Recuperación del checador ZKTeco (almx_zkt_attendance) 16 -> 19.
+-- Origen: producción 16 al cierre del 30-oct-2026: 1 terminal(es) y 76 PIN de empleados.
+-- Se conserva last_attlog_stamp de 16 para que la terminal solo envíe checadas nuevas.
+-- Paso físico al arrancar 19: en la terminal, Menú > Comm > Cloud Server, cambiar el servidor
+-- de alam.mx al dominio de 19.
+BEGIN;
+INSERT INTO zk_device (id, name, serial_number, active, tz, location_note, last_attlog_stamp, cmd_seq_counter, last_seen, create_uid, create_date, write_uid, write_date) VALUES
+(1,'Alamex General','BOCK220962289',true,'America/Mexico_City','General','9999',2,'2026-10-30 23:54:56',1,now(),1,now())
+ON CONFLICT (id) DO NOTHING;
+SELECT setval('zk_device_id_seq', (SELECT max(id) FROM zk_device));
+UPDATE hr_employee SET zk_pin = '21' WHERE id = 56;
+UPDATE hr_employee SET zk_pin = '27' WHERE id = 58;
+UPDATE hr_employee SET zk_pin = '28' WHERE id = 59;
+UPDATE hr_employee SET zk_pin = '15' WHERE id = 254;
+UPDATE hr_employee SET zk_pin = '16' WHERE id = 425;
+UPDATE hr_employee SET zk_pin = '39' WHERE id = 431;
+UPDATE hr_employee SET zk_pin = '35' WHERE id = 432;
+UPDATE hr_employee SET zk_pin = '64' WHERE id = 448;
+UPDATE hr_employee SET zk_pin = '23' WHERE id = 450;
+UPDATE hr_employee SET zk_pin = '70' WHERE id = 456;
+UPDATE hr_employee SET zk_pin = '25' WHERE id = 459;
+UPDATE hr_employee SET zk_pin = '59' WHERE id = 460;
+UPDATE hr_employee SET zk_pin = '13' WHERE id = 471;
+UPDATE hr_employee SET zk_pin = '34' WHERE id = 502;
+UPDATE hr_employee SET zk_pin = '61' WHERE id = 504;
+UPDATE hr_employee SET zk_pin = '24' WHERE id = 522;
+UPDATE hr_employee SET zk_pin = '45' WHERE id = 543;
+UPDATE hr_employee SET zk_pin = '55' WHERE id = 546;
+UPDATE hr_employee SET zk_pin = '46' WHERE id = 548;
+UPDATE hr_employee SET zk_pin = '60' WHERE id = 557;
+UPDATE hr_employee SET zk_pin = '33' WHERE id = 565;
+UPDATE hr_employee SET zk_pin = '54' WHERE id = 567;
+UPDATE hr_employee SET zk_pin = '67' WHERE id = 573;
+UPDATE hr_employee SET zk_pin = '31' WHERE id = 587;
+UPDATE hr_employee SET zk_pin = '17' WHERE id = 592;
+UPDATE hr_employee SET zk_pin = '50' WHERE id = 593;
+UPDATE hr_employee SET zk_pin = '53' WHERE id = 596;
+UPDATE hr_employee SET zk_pin = '22' WHERE id = 597;
+UPDATE hr_employee SET zk_pin = '30' WHERE id = 599;
+UPDATE hr_employee SET zk_pin = '6' WHERE id = 601;
+UPDATE hr_employee SET zk_pin = '36' WHERE id = 604;
+UPDATE hr_employee SET zk_pin = '44' WHERE id = 606;
+UPDATE hr_employee SET zk_pin = '8' WHERE id = 613;
+UPDATE hr_employee SET zk_pin = '37' WHERE id = 622;
+UPDATE hr_employee SET zk_pin = '3' WHERE id = 623;
+UPDATE hr_employee SET zk_pin = '38' WHERE id = 624;
+UPDATE hr_employee SET zk_pin = '19' WHERE id = 625;
+UPDATE hr_employee SET zk_pin = '41' WHERE id = 629;
+UPDATE hr_employee SET zk_pin = '29' WHERE id = 632;
+UPDATE hr_employee SET zk_pin = '49' WHERE id = 638;
+UPDATE hr_employee SET zk_pin = '32' WHERE id = 643;
+UPDATE hr_employee SET zk_pin = '63' WHERE id = 644;
+UPDATE hr_employee SET zk_pin = '51' WHERE id = 648;
+UPDATE hr_employee SET zk_pin = '20' WHERE id = 649;
+UPDATE hr_employee SET zk_pin = '26' WHERE id = 652;
+UPDATE hr_employee SET zk_pin = '40' WHERE id = 653;
+UPDATE hr_employee SET zk_pin = '57' WHERE id = 654;
+UPDATE hr_employee SET zk_pin = '48' WHERE id = 655;
+UPDATE hr_employee SET zk_pin = '58' WHERE id = 659;
+UPDATE hr_employee SET zk_pin = '68' WHERE id = 661;
+UPDATE hr_employee SET zk_pin = '5' WHERE id = 662;
+UPDATE hr_employee SET zk_pin = '7' WHERE id = 663;
+UPDATE hr_employee SET zk_pin = '42' WHERE id = 668;
+UPDATE hr_employee SET zk_pin = '43' WHERE id = 672;
+UPDATE hr_employee SET zk_pin = '52' WHERE id = 673;
+UPDATE hr_employee SET zk_pin = '47' WHERE id = 676;
+UPDATE hr_employee SET zk_pin = '14' WHERE id = 678;
+UPDATE hr_employee SET zk_pin = '10' WHERE id = 681;
+UPDATE hr_employee SET zk_pin = '65' WHERE id = 682;
+UPDATE hr_employee SET zk_pin = '69' WHERE id = 683;
+UPDATE hr_employee SET zk_pin = '9' WHERE id = 684;
+UPDATE hr_employee SET zk_pin = '4' WHERE id = 685;
+UPDATE hr_employee SET zk_pin = '11' WHERE id = 688;
+UPDATE hr_employee SET zk_pin = '12' WHERE id = 689;
+UPDATE hr_employee SET zk_pin = '56' WHERE id = 690;
+UPDATE hr_employee SET zk_pin = '62' WHERE id = 692;
+UPDATE hr_employee SET zk_pin = '66' WHERE id = 693;
+UPDATE hr_employee SET zk_pin = '18' WHERE id = 694;
+UPDATE hr_employee SET zk_pin = '1' WHERE id = 695;
+UPDATE hr_employee SET zk_pin = '72' WHERE id = 697;
+UPDATE hr_employee SET zk_pin = '71' WHERE id = 698;
+UPDATE hr_employee SET zk_pin = '74' WHERE id = 699;
+UPDATE hr_employee SET zk_pin = '73' WHERE id = 700;
+UPDATE hr_employee SET zk_pin = '75' WHERE id = 704;
+UPDATE hr_employee SET zk_pin = '76' WHERE id = 705;
+UPDATE hr_employee SET zk_pin = '77' WHERE id = 706;
+COMMIT;
