@@ -2,7 +2,7 @@ from . import models
 
 # Responsables vigentes al portar (sept 2026), por login para no depender de ids.
 _DEFAULT_USERS = {
-    'task_sku': 'diego.u@alam.mx',
+    'task_sku': 'saul.m@alam.mx',
     'task_fotos': 'sabrina.f@alam.mx',
     'task_sat': 'silvia.f@alam.mx',
     'task_ficha_interna': 'zuriel.v@alam.mx',
