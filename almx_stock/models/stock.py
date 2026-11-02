@@ -41,7 +41,10 @@ class StockPicking(models.Model):
     # justo lo que se pidio que SI pudieran hacer, solo sin editar). Con un
     # compute + sudo() se lee el valor saltandose esa restriccion puntual,
     # y el campo se queda de solo lectura para todos por no tener inverse.
-    x_studio_completamente_pagado = fields.Boolean(string='Completamente pagado', compute='_compute_completamente_pagado', store=True)
+    # 19.0.13.6: tracking=True para que el cambio de "Venta Pagada" en la SO
+    # vuelva a quedar en el chatter del OUT con el usuario que lo marco (como
+    # hacia el campo de Studio en 16).
+    x_studio_completamente_pagado = fields.Boolean(string='Completamente pagado', compute='_compute_completamente_pagado', store=True, tracking=True)
 
     # ALMX (sept 2026, port a 19): URLs de evidencia fotográfica. En 16 eran
     # campos de Studio (x_studio_*) mostrados por una vista de Studio que no
