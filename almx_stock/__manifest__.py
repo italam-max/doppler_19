@@ -24,6 +24,9 @@
           de stock.picking: arma calle/ciudad/estado/CP/país a partir de partner_only_dir o
           partner_id (el que tenga valor), sin exponer nombre/teléfono/otros datos del contacto.
           Campo no almacenado (se calcula al vuelo), visible para todos los usuarios.
+        - 13.6: Agrega tracking al campo x_studio_completamente_pagado del OUT para que el
+          cambio de "Venta Pagada" en la SO se registre en el chatter del OUT con el usuario
+          que lo marco, como en 16.
     """,
 
     'author': "Alamex",
@@ -33,7 +36,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Inventory',
-    'version': '19.0.13.5',
+    'version': '19.0.13.6',
 
     # any module necessary for this one to work correctly
     'depends': ['base',

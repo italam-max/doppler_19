@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Solicitud: Responsable, botón "Marcar como hecho" y estado Hecho -->
+    <record id="approval_request_view_form_almx" model="ir.ui.view">
+        <field name="name">approval.request.form.almx</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_cancel']" position="before">
+                <button name="action_done" string="Marcar como hecho" type="object"
+                        class="btn-primary" invisible="request_status != 'approved'"/>
+            </xpath>
+            <xpath expr="//header/button[@name='action_withdraw']" position="attributes">
+                <attribute name="invisible">request_status in ('new', 'done') or user_status in ['waiting', 'pending', 'cancel'] or not user_status</attribute>
+            </xpath>
+            <xpath expr="//header/field[@name='request_status']" position="attributes">
+                <attribute name="statusbar_visible">new,pending,approved,done,refused</attribute>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="responsible_id" readonly="request_status != 'new'" force_save="1"
+                       widget="many2one_avatar_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="approval_request_view_tree_almx" model="ir.ui.view">
+        <field name="name">approval.request.list.almx</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='request_status']" position="attributes">
+                <attribute name="decoration-muted">request_status == 'done'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='request_status']" position="before">
+                <field name="responsible_id" optional="show" widget="many2one_avatar_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="approval_search_view_search_almx" model="ir.ui.view">
+        <field name="name">approval.request.search.almx</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_search_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_refused_requests']" position="after">
+                <filter string="Hecho" name="filter_done_requests" domain="[('request_status', '=', 'done')]"/>
+            </xpath>
+            <xpath expr="//filter[@name='filter_my_request']" position="after">
+                <filter string="Soy responsable" name="filter_my_responsible" domain="[('responsible_id', '=', uid)]"/>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="responsible_id"/>
+            </xpath>
+            <xpath expr="//filter[@name='groupby_category_id']" position="after">
+                <filter string="Responsable" name="groupby_responsible" context="{'group_by': 'responsible_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Categoría: grupos de lectura y responsable -->
+    <record id="approval_category_view_form_almx" model="ir.ui.view">
+        <field name="name">approval.category.form.almx</field>
+        <field name="model">approval.category</field>
+        <field name="inherit_id" ref="approvals.approval_category_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='approvers']" position="after">
+                <group string="Visibilidad y responsable" name="almx_read_groups">
+                    <field name="read_group_ids" widget="many2many_tags"/>
+                    <field name="responsible_id" widget="many2one_avatar_user"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

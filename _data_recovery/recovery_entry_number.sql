@@ -1,5 +1,5 @@
 -- Recuperación de número de pedimento (stock.picking.entry_number) 16 -> 19 (almx_purchases).
--- 204 recepciones, extraído de producción 16 el 2026-09-23. Se copian TAL CUAL (incluye capturas
+-- 225 recepciones, extraído de producción 16 al cierre del 30-oct-2026. Se copian TAL CUAL (incluye capturas
 -- que no son pedimento, p. ej. 'N/A', notas o números de PO); ver almx_purchases 19 para el formato.
 -- Correr DESPUÉS de instalar almx_purchases 19 (crea la columna entry_number).
 BEGIN;
@@ -145,6 +145,7 @@ UPDATE stock_picking SET entry_number = '26 43 1925 6000873' WHERE id = 123886;
 UPDATE stock_picking SET entry_number = 'MSBU5152610' WHERE id = 123917;
 UPDATE stock_picking SET entry_number = '26 43 1925 6000635' WHERE id = 123969;
 UPDATE stock_picking SET entry_number = '26 16 1925 6100670' WHERE id = 123986;
+UPDATE stock_picking SET entry_number = '26 43 1925 6001331' WHERE id = 123994;
 UPDATE stock_picking SET entry_number = '26 16 1925 6100413' WHERE id = 124139;
 UPDATE stock_picking SET entry_number = '26 16 1925 6100428' WHERE id = 124197;
 UPDATE stock_picking SET entry_number = 'mayo 2026' WHERE id = 124199;
@@ -157,6 +158,7 @@ UPDATE stock_picking SET entry_number = '26 16 1925 6100428' WHERE id = 124364;
 UPDATE stock_picking SET entry_number = 'N/A' WHERE id = 124509;
 UPDATE stock_picking SET entry_number = '26 47 6087 6081428' WHERE id = 124551;
 UPDATE stock_picking SET entry_number = 'NO TIENE' WHERE id = 124614;
+UPDATE stock_picking SET entry_number = '26 16 1925 6101076' WHERE id = 124681;
 UPDATE stock_picking SET entry_number = 'SIN PEDIMENTO' WHERE id = 124707;
 UPDATE stock_picking SET entry_number = 'SIN PEDIMENTO' WHERE id = 124709;
 UPDATE stock_picking SET entry_number = 'PO04479' WHERE id = 124746;
@@ -173,6 +175,7 @@ UPDATE stock_picking SET entry_number = '26 16 1925 6100807' WHERE id = 125253;
 UPDATE stock_picking SET entry_number = '.' WHERE id = 125328;
 UPDATE stock_picking SET entry_number = '.' WHERE id = 125401;
 UPDATE stock_picking SET entry_number = '26 16 1925 6100568' WHERE id = 125402;
+UPDATE stock_picking SET entry_number = 'xxx' WHERE id = 125441;
 UPDATE stock_picking SET entry_number = '26 16 1925 6100568' WHERE id = 125452;
 UPDATE stock_picking SET entry_number = 'MSBU5152610' WHERE id = 125492;
 UPDATE stock_picking SET entry_number = '26 16 1925 6100670' WHERE id = 125667;
@@ -188,7 +191,9 @@ UPDATE stock_picking SET entry_number = '0' WHERE id = 126133;
 UPDATE stock_picking SET entry_number = '0' WHERE id = 126140;
 UPDATE stock_picking SET entry_number = '26 16 1925 6100670' WHERE id = 126202;
 UPDATE stock_picking SET entry_number = 'NOTIENE' WHERE id = 126240;
+UPDATE stock_picking SET entry_number = '26 16 1925 6101076' WHERE id = 126341;
 UPDATE stock_picking SET entry_number = '1925 6100114' WHERE id = 126496;
+UPDATE stock_picking SET entry_number = '26 85 1875 6204528' WHERE id = 126511;
 UPDATE stock_picking SET entry_number = 'N/A' WHERE id = 126532;
 UPDATE stock_picking SET entry_number = '26 43 1925 6000873' WHERE id = 126550;
 UPDATE stock_picking SET entry_number = '26 43 1925 6000873' WHERE id = 126624;
@@ -201,17 +206,33 @@ UPDATE stock_picking SET entry_number = '26 43 1925 6000873' WHERE id = 126875;
 UPDATE stock_picking SET entry_number = '26 43 1925 6000873' WHERE id = 126921;
 UPDATE stock_picking SET entry_number = '26 16 1925 6100807' WHERE id = 126973;
 UPDATE stock_picking SET entry_number = '26 43 1925 6000873' WHERE id = 127037;
+UPDATE stock_picking SET entry_number = '26 85 1875 6204528' WHERE id = 127165;
+UPDATE stock_picking SET entry_number = '26 85 1875 6204528' WHERE id = 127252;
 UPDATE stock_picking SET entry_number = '0' WHERE id = 127486;
 UPDATE stock_picking SET entry_number = '0' WHERE id = 127523;
 UPDATE stock_picking SET entry_number = '26 43 1925 6001079' WHERE id = 127532;
+UPDATE stock_picking SET entry_number = '26 43 1925 6001331' WHERE id = 127595;
+UPDATE stock_picking SET entry_number = '26 85 1875 6204528' WHERE id = 127615;
+UPDATE stock_picking SET entry_number = '26 43 1925 6001331' WHERE id = 127643;
 UPDATE stock_picking SET entry_number = '26 43 1925 6001079' WHERE id = 127644;
 UPDATE stock_picking SET entry_number = '26 43 1925 6001079' WHERE id = 127654;
+UPDATE stock_picking SET entry_number = '26 43 1925 6001331' WHERE id = 127884;
 UPDATE stock_picking SET entry_number = 'N/A' WHERE id = 127936;
+UPDATE stock_picking SET entry_number = 'N/A' WHERE id = 128147;
+UPDATE stock_picking SET entry_number = '26 43 1925 6001574' WHERE id = 128189;
+UPDATE stock_picking SET entry_number = '26 43 1925 6001331' WHERE id = 128260;
+UPDATE stock_picking SET entry_number = '26 85 1875 6204528' WHERE id = 128390;
+UPDATE stock_picking SET entry_number = 'Para' WHERE id = 128454;
+UPDATE stock_picking SET entry_number = 'N/A' WHERE id = 128496;
+UPDATE stock_picking SET entry_number = '26 16 1925 6101076' WHERE id = 128502;
+UPDATE stock_picking SET entry_number = 'N/A' WHERE id = 128549;
+UPDATE stock_picking SET entry_number = 'N/A' WHERE id = 128693;
+UPDATE stock_picking SET entry_number = '0' WHERE id = 128710;
 
 -- Proveedores de importación: los que en 16 tienen recepciones con pedimento válido
 -- (la mayoría no tiene país capturado, por eso no los detecta la regla por país).
 -- Se excluye Elevadores Alamex S.A. de C.V. (2448, nacional).
-UPDATE res_partner SET almx_import_vendor = TRUE WHERE id IN (17886,57121,22979,65579,24484,23600,906,14310,17189,23309,2447,966,23795,4058,21502,4067,23484,65880,65974,66003,23438);
+UPDATE res_partner SET almx_import_vendor = TRUE WHERE id IN (17886,57121,22979,65579,24484,23600,906,14310,17189,23309,2447,966,23795,4058,21502,4067,23484,65880,65974,66003,23438,66050);
 -- Órdenes de compra de proveedores de importación (incluye los marcados por país al instalar).
 UPDATE purchase_order po SET almx_is_import = TRUE
   FROM res_partner p, res_partner cp

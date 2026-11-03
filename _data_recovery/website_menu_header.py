@@ -1,0 +1,419 @@
+# -*- coding: utf-8 -*-
+"""
+_data_recovery/website_menu_header.py
+=====================================
+
+Problema (detectado en staging 19, oct-2026):
+  El upgrade 16 -> 19 dejó `website.menu_id` del sitio "Alamex" apuntando a
+  "Jobs" (menú raíz huérfano sin hijos), así que el encabezado sale sin
+  navegación. Además la plantilla trae el teléfono de ejemplo
+  (+1 555-555-5556), carrito, wishlist y buscador que en 16 no se usan.
+
+Qué hace (idempotente, se puede correr N veces):
+  1. Lee de Odoo 16 (vía JSON-RPC) el árbol de menús del sitio, en en_US y es_MX,
+     con URLs, orden, "abrir en nueva pestaña" y mega menús.
+  2. Lo recrea en 19 bajo un menú raíz propio del website y lo deja como menú
+     principal. Los registros que crea se marcan con xmlid
+     __data_recovery__.website<W>_menu_<id16>; en cada corrida se actualizan
+     y se borran los que ya no existan en 16. No toca ningún otro menú.
+  3. Reemplaza el teléfono de ejemplo por el real (solo vistas activas visibles).
+  4. Apaga el buscador y la leyenda "Powered by Odoo" del footer, oculta carrito y
+     wishlist y centra el menú.
+  5. Corrige variables del tema mal convertidas por el upgrade: btn-font-size
+     quedó en 0.3125rem (5 px) y hacía ilegible "Iniciar sesión"; se regresa a 1rem.
+  6. Reapunta personalizaciones del editor hechas en 16 cuyo xpath ya no existe en 19
+     (p. ej. el encabezado de /blog, que daba error 500).
+  7. Convierte enlaces absolutos al propio sitio (https://www.alam.mx/...) en menús,
+     mega menús y contenido de páginas a rutas relativas (/...), para que en staging
+     no lleven a producción y no dependan del dominio.
+
+Uso (shell de Odoo.sh, desde la carpeta del repo doppler_19):
+  export ODOO16_URL=https://www.alam.mx
+  export ODOO16_DB=odoo13_backup_2024_12_14_09_55
+  export ODOO16_LOGIN=italam@alam.mx
+  read -rs ODOO16_KEY && export ODOO16_KEY     # API key de 16 (no se guarda)
+  DRY_RUN=1 odoo-bin shell < _data_recovery/website_menu_header.py   # prueba
+  odoo-bin shell < _data_recovery/website_menu_header.py             # aplica
+
+Variables opcionales:
+  ODOO19_WEBSITE_ID (default 1), ODOO16_WEBSITE_ID (default: mismo nombre),
+  PHONE_DISPLAY (default "55 5532 2739"), PHONE_TEL (default "+525555322739"),
+  HEADER_OFF (keys separadas por coma; vacío = no apagar nada).
+"""
+import json
+import os
+import urllib.request
+
+DRY_RUN = os.environ.get("DRY_RUN") == "1"
+URL16 = os.environ["ODOO16_URL"].rstrip("/")
+DB16 = os.environ["ODOO16_DB"]
+LOGIN16 = os.environ["ODOO16_LOGIN"]
+KEY16 = os.environ["ODOO16_KEY"]
+W = int(os.environ.get("ODOO19_WEBSITE_ID", "1"))
+PHONE_DISPLAY = os.environ.get("PHONE_DISPLAY", "55 5532 2739")
+PHONE_TEL = os.environ.get("PHONE_TEL", "+525555322739")
+PLACEHOLDER = "+1 555-555-5556"
+# Opciones del header que se apagan desactivando su vista (herencias opcionales)
+HEADER_OFF = [k.strip() for k in os.environ.get(
+    "HEADER_OFF", "website.header_search_box").split(",") if k.strip()]
+# Bloques que se quitan con una vista heredada (xpath -> replace vacío) para el website.
+# web.brand_promotion pinta la leyenda "El mejor ... de código abierto / Powered by Odoo"
+# en el footer; website.brand_promotion solo cambia su texto, apagarla no la oculta.
+XPATH_HIDE = {
+    "web.brand_promotion": ("//div[hasclass('o_brand_promotion')]", "brand_promotion"),
+}
+# Plantillas que el header llama con t-call: desactivarlas no las oculta, se fuerza su
+# variable de visibilidad a False con una vista heredada para el website
+HEADER_HIDE = {
+    "website_sale.header_cart_link": ("show_cart", "cart"),
+    "website_sale_wishlist.header_wishlist_link": ("show_wishes", "wishlist"),
+}
+# Variables del tema que el upgrade convirtió mal (16 -> 19). btn-font-size quedó en
+# 0.3125rem (5 px) y dejaba "Iniciar sesión" ilegible; en 16 es 1rem.
+THEME_VARS = dict(kv.split("=", 1) for kv in os.environ.get(
+    "THEME_VARS", "btn-font-size=1rem").split(",") if "=" in kv)
+USER_VALUES_URL = "/website/static/src/scss/options/user_values.scss"
+# Personalizaciones del editor hechas en 16 cuyo xpath ya no existe en las plantillas de 19:
+# la página truena (error 500) porque Odoo no encuentra dónde insertarlas. Se reapuntan al
+# elemento equivalente de 19 conservando el contenido. (clave de vista, xpath 16, xpath 19)
+XPATH_RETARGET = [
+    # /blog: encabezado "Alamex Blog" de la página "Todos los blogs"
+    ("website_blog.blog_post_short_oe_structure_blog_all_header",
+     "//*[hasclass('oe_structure')][@id='oe_structure_blog_all_header']",
+     "//t[@t-elif='blogs']/div[hasclass('oe_structure')]"),
+]
+# Alineación del menú en el header (opción nativa del editor). En 16 va centrado; el
+# upgrade dejó la plantilla "vertical" alineada a la izquierda.
+HEADER_TEMPLATE = os.environ.get("HEADER_TEMPLATE", "vertical")
+HEADER_ALIGN = os.environ.get("HEADER_ALIGN", "center")  # left | center | right
+XMOD = "__data_recovery__"
+MENU_FIELDS = ["name", "url", "parent_id", "sequence", "new_window",
+               "mega_menu_content", "mega_menu_classes"]
+
+
+def log(msg):
+    print("[website_menu_header] " + msg)
+
+
+# Enlaces absolutos al propio sitio (https://www.alam.mx/blog) -> relativos (/blog), para
+# que funcionen igual en staging y en producción. Solo alam.mx / www.alam.mx; no toca
+# subdominios (dev.alam.mx) ni correos (@alam.mx).
+import re
+SITE_ABS_RE = re.compile(r"https?://(?:www\.)?alam\.mx(?=[/\"'\s)&?#]|$)", re.I)
+
+
+def relativize(text):
+    if not text:
+        return text
+    # "https://www.alam.mx/x" -> "/x" ; "https://www.alam.mx" (sin ruta) -> "/"
+    out = SITE_ABS_RE.sub("", text)
+    out = re.sub(r"(href=|src=)([\"'])(?=[\"'])", r"\1\2/", out)
+    return out
+
+
+# ---------------------------------------------------------------- Odoo 16 RPC
+def _rpc(service, method, *args):
+    payload = {"jsonrpc": "2.0", "method": "call", "id": 1,
+               "params": {"service": service, "method": method, "args": list(args)}}
+    # Cloudflare (alam.mx) responde 403 al User-Agent por defecto "Python-urllib"
+    req = urllib.request.Request(URL16 + "/jsonrpc", data=json.dumps(payload).encode(),
+                                 headers={"Content-Type": "application/json",
+                                          "User-Agent": "Alamex-DataRecovery/1.0"})
+    with urllib.request.urlopen(req, timeout=120) as resp:
+        res = json.loads(resp.read())
+    if res.get("error"):
+        err = res["error"]
+        raise RuntimeError((err.get("data") or {}).get("message") or err)
+    return res["result"]
+
+
+uid16 = _rpc("common", "authenticate", DB16, LOGIN16, KEY16, {})
+if not uid16:
+    raise RuntimeError("No se pudo autenticar en 16 (revisa login/API key)")
+
+
+def call16(model, method, args, **kw):
+    return _rpc("object", "execute_kw", DB16, uid16, KEY16, model, method, args, kw)
+
+
+# ------------------------------------------------------------------- Contexto
+website = env["website"].browse(W)
+if not website.exists():
+    raise RuntimeError("No existe el website %s en 19" % W)
+langs19 = [code for code, _name in env["res.lang"].get_installed()]
+
+sites16 = call16("website", "search_read", [[]], fields=["name", "menu_id"])
+if os.environ.get("ODOO16_WEBSITE_ID"):
+    site16 = next(s for s in sites16 if s["id"] == int(os.environ["ODOO16_WEBSITE_ID"]))
+else:
+    site16 = next((s for s in sites16 if s["name"] == website.name), sites16[0])
+root16 = site16["menu_id"][0]
+log("16: website '%s' (id %s), menú raíz %s" % (site16["name"], site16["id"], root16))
+
+by_lang = {}
+for lang in {"en_US", *langs19}:
+    # child_of en 16 también trae menús de otros sitios/genéricos: filtrar por website
+    rows = call16("website.menu", "search_read",
+                  [[("id", "child_of", root16), ("website_id", "=", site16["id"])]],
+                  fields=MENU_FIELDS, context={"lang": lang})
+    by_lang[lang] = {r["id"]: r for r in rows}
+menus16 = by_lang["en_US"]
+log("16: %s menús en el árbol" % (len(menus16) - 1))
+
+# ------------------------------------------------------------ Helpers de 19
+IMD = env["ir.model.data"].sudo()
+Menu = env["website.menu"].sudo().with_context(lang="en_US")
+
+
+def xml_name(suffix):
+    return "website%s_menu_%s" % (W, suffix)
+
+
+def ours(name, Model=None):
+    Model = Model if Model is not None else Menu
+    imd = IMD.search([("module", "=", XMOD), ("name", "=", name)], limit=1)
+    return Model.browse(imd.res_id).exists() if imd else Model.browse()
+
+
+def mark(name, rec):
+    imd = IMD.search([("module", "=", XMOD), ("name", "=", name)], limit=1)
+    if imd:
+        imd.write({"res_id": rec.id, "model": rec._name})
+    else:
+        IMD.create({"module": XMOD, "name": name, "model": rec._name,
+                    "res_id": rec.id, "noupdate": True})
+
+
+def upsert(name, vals, Model=None):
+    Model = Model if Model is not None else Menu
+    rec = ours(name, Model)
+    if rec:
+        # 19 valida parent_id en cada escritura y rechaza menús con hijos bajo un submenú
+        # (16 permite 3 niveles). Solo se escribe el padre si de verdad cambió.
+        if "parent_id" in vals and rec.parent_id.id == (vals["parent_id"] or False):
+            vals = {k: v for k, v in vals.items() if k != "parent_id"}
+        rec.write(vals)
+    else:
+        rec = Model.create(vals)
+        mark(name, rec)
+    return rec
+
+
+# ---------------------------------------------------------- 1. Árbol de menú
+root = upsert(xml_name("root"), {"name": "Top Menu", "url": "/default-main-menu",
+                                 "website_id": W, "parent_id": False})
+seen = {xml_name("root")}
+
+# Recorrido por niveles para que el padre siempre exista antes que el hijo
+mapping = {root16: root}
+pending = [m for m in menus16.values() if m["id"] != root16]
+while pending:
+    progressed = False
+    for m in list(pending):
+        parent16 = m["parent_id"] and m["parent_id"][0]
+        if parent16 not in mapping:
+            continue
+        name = xml_name(m["id"])
+        rec = upsert(name, {
+            "name": m["name"],
+            "url": relativize(m["url"]) or ("/" if m["url"] else "#"),
+            "sequence": m["sequence"],
+            "new_window": m["new_window"],
+            "website_id": W,
+            "parent_id": mapping[parent16].id,
+            "mega_menu_content": relativize(m.get("mega_menu_content")) or False,
+            "mega_menu_classes": m.get("mega_menu_classes") or False,
+        })
+        # Traducciones (solo si difieren del inglés)
+        for lang in langs19:
+            if lang == "en_US":
+                continue
+            tr = by_lang[lang].get(m["id"]) or {}
+            vals = {}
+            if tr.get("name") and tr["name"] != m["name"]:
+                vals["name"] = tr["name"]
+            if tr.get("mega_menu_content") and tr["mega_menu_content"] != m.get("mega_menu_content"):
+                vals["mega_menu_content"] = relativize(tr["mega_menu_content"])
+            if vals:
+                rec.with_context(lang=lang).write(vals)
+        mapping[m["id"]] = rec
+        seen.add(name)
+        pending.remove(m)
+        progressed = True
+    if not progressed:
+        log("AVISO: %s menús sin padre alcanzable, se omiten: %s"
+            % (len(pending), [p["name"] for p in pending]))
+        break
+
+# Limpieza: menús creados por este script en corridas previas que ya no están en 16
+stale = IMD.search([("module", "=", XMOD), ("model", "=", "website.menu"),
+                    ("name", "=like", xml_name("%")), ("name", "not in", list(seen))])
+if stale:
+    Menu.browse(stale.mapped("res_id")).exists().unlink()
+    stale.unlink()
+    log("Eliminados %s menús obsoletos de corridas previas" % len(stale))
+
+# El menú principal del website es el primer raíz por (sequence, id): ponemos el nuestro primero
+others = Menu.search([("website_id", "=", W), ("parent_id", "=", False), ("id", "!=", root.id)])
+root.sequence = min([0] + others.mapped("sequence")) - 1
+if others:
+    log("Raíces que quedan sin usar (no se tocan): %s"
+        % ", ".join("%s:%s" % (o.id, o.name) for o in others))
+
+# ------------------------------------------------------ 2. Vistas del header
+View = env["ir.ui.view"].sudo().with_context(active_test=False)
+
+
+def website_view(key):
+    views = View.search([("key", "=", key), ("website_id", "in", [W, False])])
+    return views.filtered(lambda v: v.website_id.id == W)[:1] or views[:1]
+
+
+def write_for_website(view, vals, lang="en_US"):
+    # Con website_id en contexto, Odoo hace copy-on-write: la vista genérica no se toca
+    view.with_context(website_id=W, lang=lang).write(vals)
+
+
+# Teléfono: solo vistas activas que se ven en el sitio (header, footer, contacto).
+# Se excluyen plantillas inactivas (variantes de footer) y snippets "website.s_*",
+# que son la plantilla de bloques nuevos, no contenido publicado.
+phone_keys = set(View.search([("arch_db", "ilike", PLACEHOLDER),
+                              ("website_id", "in", [W, False]),
+                              ("active", "=", True)]).mapped("key"))
+phone_keys = {k for k in phone_keys if k and not k.startswith("website.s_")}
+for key in sorted(phone_keys):
+    if not website_view(key).active:
+        continue
+    changed = False
+    for lang in ["en_US"] + [l for l in langs19 if l != "en_US"]:
+        v = website_view(key)
+        arch = v.with_context(lang=lang).arch_db or ""
+        if PLACEHOLDER not in arch:
+            continue
+        new = (arch.replace("tel:" + PLACEHOLDER, "tel:" + PHONE_TEL)
+                   .replace(PLACEHOLDER, PHONE_DISPLAY))
+        write_for_website(v, {"arch_db": new}, lang)
+        changed = True
+    if changed:
+        log("Teléfono actualizado en vista %s" % key)
+
+# Elementos del header que no se usan
+for key in HEADER_OFF:
+    v = website_view(key)
+    if not v:
+        log("Vista %s no existe, se omite" % key)
+    elif v.active or not v.website_id:
+        write_for_website(v, {"active": False})
+        log("Apagada en el header: %s" % key)
+
+# Carrito y wishlist: vista heredada website-specific que fuerza la visibilidad a False
+for key, (var, slug) in HEADER_HIDE.items():
+    # La vista que se renderiza para el website: su copia propia si existe, si no la genérica
+    target = website_view(key)
+    if not target:
+        log("Vista %s no existe, se omite" % key)
+        continue
+    # Una versión previa de este script desactivaba la copia del website; no se puede
+    # borrar (tiene vistas hijas), así que se reactiva para dejarla como estaba
+    if not target.active:
+        target.write({"active": True})
+        log("Reactivada copia previa de %s (id %s)" % (key, target.id))
+    upsert("website%s_hide_%s" % (W, slug), {
+        "name": "Alamex: ocultar %s en header" % slug,
+        "key": "%s.website%s_hide_%s" % (XMOD, W, slug),
+        "type": "qweb",
+        "mode": "extension",
+        "inherit_id": target.id,
+        "website_id": W,
+        "active": True,
+        "arch_db": ('<data><xpath expr="//t[@t-set=\'%s\']" position="after">'
+                    '<t t-set="%s" t-value="False"/></xpath></data>' % (var, var)),
+    }, View)
+    log("Oculto en el header: %s" % key)
+
+# Bloques a quitar por xpath (leyenda de Odoo en el footer)
+for key, (xpath, slug) in XPATH_HIDE.items():
+    target = website_view(key)
+    if not target:
+        log("Vista %s no existe, se omite" % key)
+        continue
+    upsert("website%s_hide_%s" % (W, slug), {
+        "name": "Alamex: quitar %s" % slug,
+        "key": "%s.website%s_hide_%s" % (XMOD, W, slug),
+        "type": "qweb",
+        "mode": "extension",
+        "inherit_id": target.id,
+        "website_id": W,
+        "active": True,
+        "arch_db": '<data><xpath expr="%s" position="replace"/></data>' % xpath,
+    }, View)
+    log("Quitado del sitio: %s" % slug)
+
+# Personalizaciones de 16 con xpath que ya no existe en 19 (páginas con error 500)
+for key, old_xp, new_xp in XPATH_RETARGET:
+    views = View.search([("key", "=", key), ("website_id", "in", [W, False])])
+    if not views:
+        log("Vista %s no existe, se omite" % key)
+        continue
+    for v in views:
+        changed = False
+        # en_US primero: Odoo propaga la estructura a las demás traducciones
+        for lang in ["en_US"] + [l for l in langs19 if l != "en_US"]:
+            arch = v.with_context(lang=lang).arch_db or ""
+            if old_xp in arch:
+                v.with_context(lang=lang).write({"arch_db": arch.replace(old_xp, new_xp)})
+                changed = True
+        log("%s xpath de %s (id %s)" % ("Reapuntado" if changed else "Ya corregido", key, v.id))
+
+# Enlaces absolutos a alam.mx en el contenido de páginas, header y footer -> relativos
+abs_views = View.search([("arch_db", "ilike", "alam.mx"), ("website_id", "in", [W, False])])
+n_views = n_links = 0
+for v in abs_views:
+    touched = False
+    # en_US primero; después se revisa cada idioma por si conserva su propia versión
+    for lang in ["en_US"] + [l for l in langs19 if l != "en_US"]:
+        arch = v.with_context(lang=lang).arch_db or ""
+        new = relativize(arch)
+        if new != arch:
+            n_links += len(SITE_ABS_RE.findall(arch))
+            v.with_context(lang=lang).write({"arch_db": new})
+            touched = True
+    n_views += touched
+log("Enlaces absolutos a alam.mx convertidos a relativos: %s en %s vistas" % (n_links, n_views))
+
+# Alineación del menú: activa la variante pedida y apaga las otras ("left" = ninguna)
+for align in ("center", "right"):
+    key = "website.template_header_%s_align_%s" % (HEADER_TEMPLATE, align)
+    v = website_view(key)
+    if not v:
+        if align == HEADER_ALIGN:
+            log("AVISO: no existe %s, la alineación no se cambió" % key)
+        continue
+    want = align == HEADER_ALIGN
+    if v.active != want:
+        write_for_website(v, {"active": want})
+    if want:
+        log("Menú del header alineado: %s (%s)" % (align, key))
+
+# ------------------------------------------------------ 3. Variables del tema
+if THEME_VARS:
+    env["website.assets"].with_context(website_id=W).make_scss_customization(
+        USER_VALUES_URL, THEME_VARS)
+    log("Variables de tema aplicadas: %s" % THEME_VARS)
+
+# ---------------------------------------------------------------- Verificación
+env.registry.clear_cache()
+website.invalidate_recordset()
+top = website.menu_id
+log("Menú principal del website %s: %s (id %s)" % (W, top.name, top.id))
+for child in top.child_id.sorted("sequence"):
+    es = child.with_context(lang="es_MX").name if "es_MX" in langs19 else child.name
+    log("  - %s%s" % (es, "  [mega menú]" if child.is_mega_menu else
+                       "  (%s submenús)" % len(child.child_id) if child.child_id else ""))
+
+if DRY_RUN:
+    env.cr.rollback()
+    log("DRY_RUN: cambios revertidos")
+else:
+    env.cr.commit()
+    log("Cambios aplicados")

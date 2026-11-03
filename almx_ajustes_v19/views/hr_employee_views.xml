@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_view_form_almx_ajustes" model="ir.ui.view">
+        <field name="name">hr.employee.form.almx.ajustes</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="almx_employee.alamex_hr_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- Ingreso y salida juntos en la pestaña Trabajo, como en 16 -->
+            <xpath expr="//group[@name='departure']" position="before">
+                <group string="Ingreso y salida" name="almx_ingreso_salida" groups="hr.group_hr_user">
+                    <xpath expr="//field[@name='x_studio_fecha_de_ingreso']" position="move"/>
+                    <field name="x_studio_fecha_de_salida"/>
+                    <field name="x_studio_motivo_de_salida"/>
+                </group>
+            </xpath>
+            <!-- Datos SAT / IMSS de solo consulta -->
+            <xpath expr="//page[@name='personal_information']" position="after">
+                <page name="almx_datos_sat" string="Datos SAT / IMSS" groups="hr.group_hr_user">
+                    <div class="alert alert-info" role="status">
+                        Datos de consulta traídos de Odoo 16. La nómina se lleva en NOI;
+                        cualquier cambio se hace allá.
+                    </div>
+                    <group>
+                        <group string="Identificación">
+                            <field name="almx_no_empleado"/>
+                            <field name="almx_rfc"/>
+                            <field name="almx_curp"/>
+                            <field name="almx_nss"/>
+                            <field name="almx_nombre"/>
+                            <field name="almx_apellido_paterno"/>
+                            <field name="almx_apellido_materno"/>
+                        </group>
+                        <group string="Relación laboral">
+                            <field name="almx_registro_patronal"/>
+                            <field name="almx_regimen"/>
+                            <field name="almx_contrato"/>
+                            <field name="almx_jornada"/>
+                            <field name="almx_sindicalizado"/>
+                            <field name="almx_estado_labora_id"/>
+                            <field name="almx_cp_fiscal"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

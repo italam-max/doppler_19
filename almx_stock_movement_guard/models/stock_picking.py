@@ -109,7 +109,7 @@ class StockPicking(models.Model):
                         name=picking.name, locs=', '.join(bad.mapped('display_name'))))
 
     # ------------------------------------------------------------------
-    # Congelado de contenido (OUT): solo lo que viene del pedido
+    # Congelado de contenido (OUT): solo lo que viene del pedido o del PICK
     # ------------------------------------------------------------------
     def _almx_frozen(self):
         return self.filtered(lambda p: p.picking_type_id.almx_freeze_lines
@@ -124,34 +124,51 @@ class StockPicking(models.Model):
 
     def _almx_check_frozen_content(self):
         """Revisión al validar (cubre cualquier camino: formulario, código de
-        barras, importación): toda línea debe venir de la SO y no se puede
-        entregar más de lo pedido. Entregar MENOS sí (backorder por falta de stock)."""
+        barras, importación). Toda línea del OUT debe estar respaldada por:
+          a) lo pendiente de entregar en la SO, o
+          b) lo que Almacén/Laboratorio ya surtió en un PICK validado de la
+             misma SO (material agregado en el PICK: componentes de "Elevador
+             Completo", lo que consume Laboratorio al armar un control, etc.).
+        Entregar MENOS sí se permite (backorder por falta de stock)."""
         for picking in self._almx_frozen():
             moves = picking.move_ids.filtered(lambda m: m.state != 'cancel')
             if all(m.origin_returned_move_id for m in moves):
                 continue
-            # Líneas sin sale_line_id (p. ej. OUT creada con el botón "Crear OUT"
-            # o capturada a mano con la SO en el encabezado): el producto debe
-            # estar en la SO y no rebasar lo pendiente de entregar de ese producto.
+            # Líneas sin sale_line_id (OUT creada con "Crear OUT", capturada a
+            # mano con la SO en el encabezado, o material agregado en el PICK).
             loose = moves.filtered(lambda m: not m.sale_line_id)
             if loose:
-                so_lines = picking.sale_id.order_line
+                so = picking.sale_id
+                so_lines = so.order_line
+                so_done = so.picking_ids.move_ids.filtered(lambda m: m.state == 'done')
+                picked = so_done.filtered(lambda m: m.picking_code == 'internal')
+                delivered = so_done.filtered(
+                    lambda m: m.picking_code == 'outgoing' and not m.origin_returned_move_id)
                 bad = []
                 for product in loose.product_id:
-                    sols = so_lines.filtered(lambda l, p=product: l.product_id == p)
-                    if not sols:
-                        bad.append(product.display_name)
-                        continue
                     uom = product.uom_id
-                    pending = sum(l.product_uom_id._compute_quantity(l.product_uom_qty - l.qty_delivered, uom)
-                                  for l in sols)
-                    qty = sum(m.product_uom._compute_quantity(m.quantity, uom)
-                              for m in loose.filtered(lambda m, p=product: m.product_id == p))
-                    if uom.compare(qty, pending) > 0:
-                        bad.append(_('%(p)s (%(q)s de %(pend)s pendientes)', p=product.display_name, q=qty, pend=pending))
+
+                    def _qty(ms, p=product, u=uom):
+                        return sum(m.product_uom._compute_quantity(m.quantity, u)
+                                   for m in ms if m.product_id == p)
+
+                    sols = so_lines.filtered(lambda l, p=product: l.product_id == p)
+                    pending_so = sum(
+                        l.product_uom_id._compute_quantity(l.product_uom_qty - l.qty_delivered, uom)
+                        for l in sols)
+                    pending_pick = _qty(picked) - _qty(delivered)
+                    allowed = max(pending_so, pending_pick, 0.0)
+                    qty = _qty(loose)
+                    if uom.compare(qty, allowed) > 0:
+                        if uom.compare(allowed, 0.0) <= 0:
+                            bad.append(product.display_name)
+                        else:
+                            bad.append(_('%(p)s (%(q)s de %(pend)s pendientes)',
+                                         p=product.display_name, q=qty, pend=allowed))
                 if bad:
                     raise UserError(picking._almx_freeze_message() + _(
-                        "\n\nNo coincide con el pedido: %s", ', '.join(bad)))
+                        "\n\nNo coincide con el pedido ni con lo surtido en el PICK: %s",
+                        ', '.join(bad)))
             over = moves.filtered(lambda m: m.product_uom.compare(m.quantity, m.product_uom_qty) > 0)
             if over:
                 raise UserError(_(
@@ -208,5 +225,5 @@ class StockPicking(models.Model):
         shipping = so.partner_shipping_id or so.partner_id
         if shipping:
             self.partner_id = shipping
-            if 'partner_only_dir' in self._fields:
-                self.partner_only_dir = so.partner_shipping_id
+        if 'partner_only_dir' in self._fields:
+            self.partner_only_dir = so.partner_shipping_id

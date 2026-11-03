@@ -23,7 +23,7 @@ class ResGroups(models.Model):
             return
 
         logins = [
-            'diego.u@alam.mx',
+            'saul.m@alam.mx',
             'yazan@alam.mx',
             'hamdi@alam.mx',
             'celia.a@alam.mx',
