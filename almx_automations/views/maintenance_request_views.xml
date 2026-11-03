@@ -11,4 +11,18 @@
             </field>
         </field>
     </record>
+
+    <!-- Busqueda por numero de venta en Peticiones de mantenimiento (nov 2026).
+         Sustituye la vista en caliente id 14123. -->
+    <record id="maintenance_request_search_almx_pedido_venta" model="ir.ui.view">
+        <field name="name">maintenance.request.search.almx.pedido.venta</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_search"/>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <xpath expr="//search/field[1]" position="after">
+                <field name="x_studio_field_ypPfL" string="Pedido de venta"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
