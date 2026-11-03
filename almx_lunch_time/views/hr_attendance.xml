@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_attendance_tree_lunch_inherit" model="ir.ui.view">
+        <field name="name">hr.attendance.list.inherit.lunch</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='check_in']" position="after">
+                <field name="lunch_start" optional="show"/>
+                <field name="lunch_end" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_form_lunch_inherit" model="ir.ui.view">
+        <field name="name">hr.attendance.form.inherit.lunch</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_employee']//field[@name='check_out']" position="after">
+                <field name="lunch_start" options="{'rounding': 0}" readonly="not is_manager"/>
+                <field name="lunch_end" options="{'rounding': 0}" readonly="not is_manager"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_employees_view_kanban_lunch_inherit" model="ir.ui.view">
+        <field name="name">hr.employee.kanban.inherit.lunch</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_attendance.hr_employees_view_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <div class="float-end" t-if="record.attendance_state.raw_value == 'lunch_start'">
+                    <span class="fa fa-circle text-info me-1" role="img" aria-label="On lunch" title="On lunch"/>
+                </div>
+                <div class="float-end" t-if="record.attendance_state.raw_value == 'lunch_end'">
+                    <span class="fa fa-circle text-success me-1" role="img" aria-label="Available" title="Available"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
