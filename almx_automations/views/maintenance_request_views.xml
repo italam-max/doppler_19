@@ -12,6 +12,8 @@
         </field>
     </record>
 
+    <!-- Borra la vista equivalente creada en caliente (3-nov) para no duplicarla. -->
+    <delete model="ir.ui.view" search="[('name', '=', 'almx.maintenance.request.search.pedido_venta')]"/>
     <!-- Busqueda por numero de venta en Peticiones de mantenimiento (nov 2026).
          Sustituye la vista en caliente id 14123. -->
     <record id="maintenance_request_search_almx_pedido_venta" model="ir.ui.view">
