@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Borra la vista equivalente creada en caliente (3-nov) para no duplicarla. -->
+    <delete model="ir.ui.view" search="[('name', '=', 'almx.stock.picking.list.columnas.ocultas')]"/>
     <!-- Lista de traslados: columnas ocultas por defecto (peticion de Direccion, nov 2026).
          Desde, A, Fecha prevista, Tipo de operacion, Agrupacion y Compania siguen
          disponibles en el selector de columnas. Sustituye la vista en caliente id 14121. -->
