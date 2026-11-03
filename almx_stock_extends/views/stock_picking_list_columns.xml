@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Lista de traslados: columnas ocultas por defecto (peticion de Direccion, nov 2026).
+         Desde, A, Fecha prevista, Tipo de operacion, Agrupacion y Compania siguen
+         disponibles en el selector de columnas. Sustituye la vista en caliente id 14121. -->
+    <record id="vpicktree_almx_columnas_ocultas" model="ir.ui.view">
+        <field name="name">stock.picking.list.almx.columnas.ocultas</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='location_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//list/field[@name='location_dest_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//list/field[@name='scheduled_date']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//list/field[@name='picking_type_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//list/field[@name='batch_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//list/field[@name='company_id'][@optional='show']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
