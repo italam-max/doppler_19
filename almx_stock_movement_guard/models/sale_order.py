@@ -20,7 +20,7 @@ class SaleOrderLine(models.Model):
     def create(self, vals_list):
         lines = super().create(vals_list)
         if not self.env.su:
-            frozen = lines._almx_sol_frozen()
+            frozen = lines._almx_sol_frozen().filtered(lambda l: not (self.env.context.get('skip_procurement') and l.move_ids and not l.product_uom_qty))
             if frozen:
                 self._almx_raise_frozen(frozen[0].order_id)
         return lines
