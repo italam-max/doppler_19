@@ -1,8 +1,9 @@
 {
     'name': 'Almuerzo: precio editable en control de proveedores',
-    'version': '19.0.1.1.1',
+    'version': '19.0.1.1.2',
     'category': 'Human Resources/Lunch',
     'summary': 'Permite editar el precio en Almuerzo > Gerente > Control de proveedores '
+               'y en Órdenes de hoy '
                'solo a los usuarios del grupo "Editor de precios de almuerzo".',
     'author': 'Celia Hernandez',
     'website': "www.alam.mx",
