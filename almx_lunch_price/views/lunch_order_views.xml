@@ -54,6 +54,9 @@
         <field name="act_window_id" ref="lunch.lunch_order_action_control_suppliers"/>
     </record>
 
+    <!-- Solo puede haber una vista de lista por accion: borra la creada en caliente (3-nov)
+         y la del propio modulo de una actualizacion anterior; el record la vuelve a crear. -->
+    <delete model="ir.actions.act_window.view" search="[('act_window_id', '=', ref('lunch.lunch_order_action_by_supplier')), ('view_mode', '=', 'list')]"/>
     <!-- Misma lista en "Órdenes de hoy" (nov 2026). Sustituye el registro en caliente id 3590. -->
     <record id="lunch_order_action_by_supplier_view_list" model="ir.actions.act_window.view">
         <field name="sequence" eval="1"/>
