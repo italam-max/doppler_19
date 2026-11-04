@@ -13,6 +13,9 @@ Este script:
   2. Asigna los usuarios que tenían en producción 16 (consulta del 4-nov-2026).
      Los usuarios inactivos en 19 no se asignan; solo se reportan.
 
+Solo toca vistas activas. Las inactivas conservan la referencia vieja: 6 de ellas
+ya están rotas (primarias sin vista padre) y no se pueden validar ni se usan.
+
 Requiere almx_ajustes_v19 >= 19.0.1.0.1 ya actualizado. Idempotente: solo agrega.
 Si una vista no valida, se cancela todo y no se guarda nada. La arquitectura
 anterior de cada vista queda en arch_prev.
@@ -54,7 +57,7 @@ COST_USERS = [
     'valente.c@alam.mx',
 ]
 
-env = env(context=dict(env.context, active_test=False, lang='en_US'))  # noqa: F821 (odoo shell)
+env = env(context=dict(env.context, lang='en_US'))  # noqa: F821 (odoo shell)
 
 group_prices = env.ref(PRICES, raise_if_not_found=False)
 group_cost = env.ref(COST, raise_if_not_found=False)
@@ -67,14 +70,13 @@ views = View.search(['|', '|',
                      ('arch_db', 'ilike', OLD_PRICES),
                      ('arch_db', 'ilike', OLD_UNIT),
                      ('arch_db', 'ilike', OLD_COST)])
-n_views = n_active = 0
+n_views = 0
 for view in views:
     arch = view.arch_db
     for pattern, new in REPLACEMENTS:
         arch = pattern.sub(new, arch)
     if arch != view.arch_db:
         n_views += 1
-        n_active += int(view.active)
         view.write({'arch_db': arch})  # valida la vista; si falla, se cancela todo
 
 # 2. Usuarios
@@ -83,7 +85,7 @@ missing = set()
 n_links = 0
 for group, logins in ((group_prices, PRICE_USERS), (group_cost, COST_USERS)):
     for login in logins:
-        user = env['res.users'].search([('login', '=', login)], limit=1)
+        user = env['res.users'].with_context(active_test=False).search([('login', '=', login)], limit=1)
         if not user:
             missing.add(login)
         elif not user.active:
@@ -92,12 +94,14 @@ for group, logins in ((group_prices, PRICE_USERS), (group_cost, COST_USERS)):
             n_links += 1
             group.write({'user_ids': [(4, user.id)]})
 
-left = View.search_count(['|', '|',
-                          ('arch_db', 'ilike', OLD_PRICES),
-                          ('arch_db', 'ilike', OLD_UNIT),
-                          ('arch_db', 'ilike', OLD_COST)])
-print('[%s] vistas actualizadas: %d (%d activas) | referencias viejas restantes: %d'
-      % ('DRY_RUN' if DRY else 'APLICADO', n_views, n_active, left))
+old_domain = ['|', '|',
+              ('arch_db', 'ilike', OLD_PRICES),
+              ('arch_db', 'ilike', OLD_UNIT),
+              ('arch_db', 'ilike', OLD_COST)]
+left = View.search_count(old_domain)
+left_inactive = View.with_context(active_test=False).search_count([('active', '=', False)] + old_domain)
+print('[%s] vistas activas actualizadas: %d | activas con referencia vieja: %d | inactivas sin tocar: %d'
+      % ('DRY_RUN' if DRY else 'APLICADO', n_views, left, left_inactive))
 print('usuarios agregados a grupos: %d' % n_links)
 print('usuarios en "%s": %d | en "%s": %d'
       % (group_prices.name, len(group_prices.user_ids), group_cost.name, len(group_cost.user_ids)))
