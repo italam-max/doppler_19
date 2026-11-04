@@ -9,15 +9,17 @@ Ajustes de Alamex sobre Aprobaciones:
 - Gastos ligados a la solicitud (en 19 ya no existe el Informe de gastos).
 - "Pagado" solo editable por Contabilidad / Administrador.
 - Aprobadores de solo lectura en la solicitud (se definen en la categoría).
+- Menú Aprobaciones de Ventas: solicitudes del equipo, de la más reciente a la más antigua.
 """,
     'author': 'Alamex / Doppler Elevadores',
     'website': 'https://www.alam.mx',
     'category': 'Human Resources/Approvals',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'license': 'LGPL-3',
     'depends': ['approvals', 'purchase', 'hr_expense'],
     'data': [
         'views/approval_request_views.xml',
+        'views/approval_sales_views.xml',
     ],
     'installable': True,
     'application': False,
