@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Alamex: Tiempo de comida',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.0.2',
     'category': 'Human Resources/Attendances',
     'author': 'Dev JS',
     'sequence': 99,
@@ -18,6 +18,7 @@
         # Systray (menú de asistencia dentro del backend)
         'web.assets_backend': [
             'almx_lunch_time/static/src/systray/**/*',
+            'almx_lunch_time/static/src/kiosk_app/**/*',
         ],
         # Kiosko público de asistencias (bundle propio de hr_attendance)
         'hr_attendance.assets_public_attendance': [
