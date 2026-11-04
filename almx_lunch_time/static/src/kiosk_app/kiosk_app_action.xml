@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="almx_lunch_time.KioskAppAction">
+        <div class="o_action h-100 w-100">
+            <iframe src="/almx_lunch_time/kiosk_app" class="h-100 w-100 border-0" allow="camera; geolocation" title="Kiosk Mode"/>
+        </div>
+    </t>
+</templates>
