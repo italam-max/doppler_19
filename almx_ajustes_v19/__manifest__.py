@@ -1,6 +1,6 @@
 {
     'name': 'Alamex - Ajustes de migración 16 → 19',
-    'version': '19.0.1.0.2',
+    'version': '19.0.1.0.3',
     'summary': 'Recupera en Odoo 19 la funcionalidad de 16 que se perdió en la migración',
     'description': """
 Ajustes detectados en la validación por áreas (oct 2026):
