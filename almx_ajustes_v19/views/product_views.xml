@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Precio y costo de producto. La prioridad alta aplica estas restricciones después de
+         otros módulos: sale_subscription reemplaza list_price en el kanban y deshace la
+         restricción puesta sobre el campo. Aquí se oculta también la etiqueta "Precio:". -->
+    <record id="product_template_kanban_hide_price_almx" model="ir.ui.view">
+        <field name="name">product.template.kanban.hide.price.label.almx</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//span[.//field[@name='list_price']]" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_prices</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_kanban_hide_price_almx" model="ir.ui.view">
+        <field name="name">product.product.kanban.hide.price.label.almx</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_kanban_view"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//span[.//field[@name='lst_price']]" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_prices</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- En los formularios los valores ya están ocultos; quedaban las etiquetas sin dato. -->
+    <record id="product_template_form_hide_labels_almx" model="ir.ui.view">
+        <field name="name">product.template.form.hide.price.labels.almx</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='list_price']" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_prices</attribute>
+            </xpath>
+            <xpath expr="//label[@for='standard_price']" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_product_cost</attribute>
+            </xpath>
+            <xpath expr="//div[@name='standard_price_uom']" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_product_cost</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_normal_form_hide_labels_almx" model="ir.ui.view">
+        <field name="name">product.product.form.hide.price.labels.almx</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='lst_price']" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_prices</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
