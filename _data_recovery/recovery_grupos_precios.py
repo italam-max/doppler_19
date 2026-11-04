@@ -13,7 +13,8 @@ Este script:
   2. Asigna los usuarios que tenían en producción 16 (consulta del 4-nov-2026).
      Los usuarios inactivos en 19 no se asignan; solo se reportan.
 
-Solo toca vistas activas. Las inactivas conservan la referencia vieja: 6 de ellas
+También reactiva las dos vistas del formulario principal de producto, que quedaron
+inactivas el 1-nov-2026. Las demás inactivas conservan la referencia vieja: 6 de ellas
 ya están rotas (primarias sin vista padre) y no se pueden validar ni se usan.
 
 Requiere almx_ajustes_v19 >= 19.0.1.0.1 ya actualizado. Idempotente: solo agrega.
@@ -79,6 +80,19 @@ for view in views:
         n_views += 1
         view.write({'arch_db': arch})  # valida la vista; si falla, se cancela todo
 
+# Formulario principal de producto: reactiva sus restricciones con los grupos nuevos.
+n_reactivated = 0
+for name in ('product.template.common.form.hide.price.almx',
+             'product.template.common.form.hide.cost.ventas'):
+    view = View.with_context(active_test=False).search(
+        [('name', '=', name), ('model', '=', 'product.template'), ('active', '=', False)], limit=1)
+    if view:
+        arch = view.arch_db
+        for pattern, new in REPLACEMENTS:
+            arch = pattern.sub(new, arch)
+        view.write({'arch_db': arch, 'active': True})
+        n_reactivated += 1
+
 # 2. Usuarios
 inactive = set()
 missing = set()
@@ -102,6 +116,7 @@ left = View.search_count(old_domain)
 left_inactive = View.with_context(active_test=False).search_count([('active', '=', False)] + old_domain)
 print('[%s] vistas activas actualizadas: %d | activas con referencia vieja: %d | inactivas sin tocar: %d'
       % ('DRY_RUN' if DRY else 'APLICADO', n_views, left, left_inactive))
+print('vistas del formulario reactivadas: %d' % n_reactivated)
 print('usuarios agregados a grupos: %d' % n_links)
 print('usuarios en "%s": %d | en "%s": %d'
       % (group_prices.name, len(group_prices.user_ids), group_cost.name, len(group_cost.user_ids)))
