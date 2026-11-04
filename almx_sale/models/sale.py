@@ -25,6 +25,10 @@ class SaleOrder(models.Model):
                                   ('modern', 'Modernización'),
                                   ('fix', 'Reparación'),],
                                  string='Tipo de venta', help='Muestra el tipo de venta que designa el vendedor', tracking=True)
+    # Tareas del proyecto 135, "Guías Mecánicas Preliminares (Paso 1)".
+    guia_mecanica_preliminar_id = fields.Many2one(
+        'project.task', string='Guías Mecánicas Preliminares',
+        domain=[('project_id', '=', 135)], tracking=True, copy=False)
     completely_paid = fields.Boolean(string='Venta Pagada', help='Muestra si el equipo de finanzas confirmó el pago de la SO', tracking=True, copy=False, groups='almx_sale.group_can_confirm_sale_payment')
     # ALMX (sept 2026): usuarios de TI/Direccion (almx_sale.group_so_admin) son
     # los unicos que pueden cancelar o eliminar pedidos de venta, y los unicos
