@@ -1,4 +1,7 @@
-import { Component } from "@odoo/owl";
+import { Component, onWillDestroy } from "@odoo/owl";
+
+// Sin regreso automatico, el kiosko se queda en la pantalla del empleado anterior.
+const LUNCH_SCREEN_TIMEOUT = 30000;
 
 /**
  * Pantalla del kiosko que se muestra cuando el empleado ya tiene la asistencia
@@ -11,6 +14,11 @@ export class KioskLunchActions extends Component {
         onLunchAction: { type: Function },
         onClickBack: { type: Function },
     };
+
+    setup() {
+        const timeout = setTimeout(() => this.props.onClickBack(), LUNCH_SCREEN_TIMEOUT);
+        onWillDestroy(() => clearTimeout(timeout));
+    }
 
     get state() {
         return this.props.employeeData.attendance_state;
