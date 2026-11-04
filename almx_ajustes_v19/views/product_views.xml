@@ -27,7 +27,10 @@
         </field>
     </record>
 
-    <!-- En los formularios los valores ya están ocultos; quedaban las etiquetas sin dato. -->
+    <!-- En los formularios los valores ya están ocultos; quedaban las etiquetas sin dato.
+         También se ocultan impuestos (tax_string muestra el precio con impuestos), categoría y
+         compañía, y la fila de unidad de medida, que sin su etiqueta desacomodaba la columna:
+         quien no ve precios solo ve Referencia y Código de barras. -->
     <record id="product_template_form_hide_labels_almx" model="ir.ui.view">
         <field name="name">product.template.form.hide.price.labels.almx</field>
         <field name="model">product.template</field>
@@ -42,6 +45,24 @@
             </xpath>
             <xpath expr="//div[@name='standard_price_uom']" position="attributes">
                 <attribute name="groups">almx_ajustes_v19.group_can_see_product_cost</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//div[@name='list_price_uom']" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_prices</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//label[@for='taxes_id']" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_prices</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//div[@name='taxes_div']" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_prices</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//field[@name='supplier_taxes_id']" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_prices</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//field[@name='categ_id']" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_prices</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//field[@name='company_id']" position="attributes">
+                <attribute name="groups">almx_ajustes_v19.group_can_see_prices</attribute>
             </xpath>
         </field>
     </record>
