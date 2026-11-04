@@ -1,6 +1,6 @@
 {
     'name': 'Alamex - Ajustes de migración 16 → 19',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.0.2',
     'summary': 'Recupera en Odoo 19 la funcionalidad de 16 que se perdió en la migración',
     'description': """
 Ajustes detectados en la validación por áreas (oct 2026):
@@ -20,6 +20,7 @@ Ajustes detectados en la validación por áreas (oct 2026):
     'license': 'LGPL-3',
     'depends': [
         'hr',
+        'product',
         'project',
         'approvals',
         'hr_holidays',
@@ -36,6 +37,7 @@ Ajustes detectados en la validación por áreas (oct 2026):
         'views/hr_leave_views.xml',
         'views/hr_employee_views.xml',
         'views/project_task_views.xml',
+        'views/product_views.xml',
     ],
     'post_init_hook': 'post_init_hook',
     'installable': True,
