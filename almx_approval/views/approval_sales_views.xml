@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Da acceso al menú. Para leer las solicitudes, el usuario también necesita
+         "Aprobaciones / Encargado". Los usuarios se asignan en Ajustes > Usuarios. -->
+    <record id="group_approval_sales" model="res.groups">
+        <field name="name">Aprobaciones: ver equipo de Ventas</field>
+        <field name="comment">Muestra el menú Aprobaciones de Ventas, sin dar acceso de Administrador.</field>
+    </record>
+
+    <record id="approval_request_view_tree_sales" model="ir.ui.view">
+        <field name="name">approval.request.list.sales</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="default_order">create_date desc</attribute>
+            </xpath>
+            <field name="name" position="after">
+                <field name="create_date" string="Creada" widget="date"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="action_approval_request_sales" model="ir.actions.act_window">
+        <field name="name">Aprobaciones de Ventas</field>
+        <field name="res_model">approval.request</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="view_id" ref="approval_request_view_tree_sales"/>
+        <field name="domain">[('request_owner_id.login', 'in', ['carlos.s@alam.mx', 'eliana.z@alam.mx', 'gerardo.b@alam.mx', 'oscar.a@alam.mx', 'sonia.g@alam.mx'])]</field>
+    </record>
+
+    <menuitem id="menu_approval_request_sales"
+              name="Aprobaciones de Ventas"
+              parent="approvals.approvals_menu_manager"
+              action="action_approval_request_sales"
+              groups="group_approval_sales"
+              sequence="15"/>
+</odoo>
