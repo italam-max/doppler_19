@@ -12,16 +12,19 @@
                 <field name="collect_date" invisible="not is_immediate" required="state == 'draft' and is_immediate" />
                 <field name="is_so_admin" invisible="1"/>
                 <field name="sale_type" widget="radio" required="state in ('draft', 'sent')" readonly="state == 'sale' and not is_so_admin"/>
-                <!-- Documentos de proyecto (campos de Studio, ya con datos de 16). No aplican a Refacciones:
-                     si un pedido de otro tipo ya tiene archivo, se sigue mostrando para no ocultarlo. -->
+                <field name="completely_paid"/>
+          </xpath>
+          <!-- Documentos de proyecto, en la columna derecha. No aplican a Refacciones: si un pedido
+               de otro tipo ya tiene archivo o guía, se sigue mostrando para no ocultarlo. -->
+          <xpath expr="//group[@name='order_details']" position="inside">
                 <field name="x_studio_presupuesto_filename" invisible="1"/>
                 <field name="x_studio_contrato_filename" invisible="1"/>
                 <field name="x_studio_adendum_filename" invisible="1"/>
                 <field name="x_studio_presupuesto" string="Presupuesto" filename="x_studio_presupuesto_filename" invisible="sale_type not in ('project', 'mantto', 'modern', 'fix') and not x_studio_presupuesto"/>
                 <field name="x_studio_contrato" string="Contrato" filename="x_studio_contrato_filename" invisible="sale_type not in ('project', 'mantto', 'modern', 'fix') and not x_studio_contrato"/>
                 <field name="x_studio_adendum" string="Adendum" filename="x_studio_adendum_filename" invisible="sale_type not in ('project', 'mantto', 'modern', 'fix') and not x_studio_adendum"/>
-                <field name="x_studio_guas_mecnicas" string="Guías Mecánicas" invisible="sale_type not in ('project', 'mantto', 'modern', 'fix') and not x_studio_guas_mecnicas"/>
-                <field name="completely_paid"/>
+                <field name="guia_mecanica_preliminar_id" options="{'no_create': True}" invisible="sale_type not in ('project', 'mantto', 'modern', 'fix') and not guia_mecanica_preliminar_id"/>
+                <field name="x_studio_guas_mecnicas" string="Guías Mecánicas Definitivas" domain="[('project_id', '=', 31)]" options="{'no_create': True}" invisible="sale_type not in ('project', 'mantto', 'modern', 'fix') and not x_studio_guas_mecnicas"/>
           </xpath>
       </field>
     </record>
