@@ -21,7 +21,10 @@ class HrAttendance(models.Model):
                 raise ValidationError(_('"Lunch Start" cannot be earlier than "Check In".'))
             if attendance.lunch_start and attendance.lunch_end and attendance.lunch_end < attendance.lunch_start:
                 raise ValidationError(_('"Lunch End" cannot be earlier than "Lunch Start".'))
-            if attendance.check_out:
+            # Los cierres automaticos (ZKTeco por salida olvidada, cron de salida
+            # automatica) no deben fallar: un error aqui perderia la checada o
+            # detendria el cron. _compute_worked_hours ya limita la comida al turno.
+            if attendance.check_out and attendance.out_mode not in ('technical', 'auto_check_out'):
                 if attendance.lunch_start and attendance.lunch_start > attendance.check_out:
                     raise ValidationError(_('"Lunch Start" cannot be later than "Check Out".'))
                 if attendance.lunch_end and attendance.lunch_end > attendance.check_out:
