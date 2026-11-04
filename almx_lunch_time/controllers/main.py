@@ -3,6 +3,8 @@
 from odoo import _, http
 from odoo.exceptions import UserError
 from odoo.http import request
+from odoo.service.common import exp_version
+from odoo.tools import py_to_js_locale
 
 from odoo.addons.hr_attendance.controllers.main import HrAttendance
 
@@ -10,6 +12,37 @@ LUNCH_ACTIONS = ('lunch_start', 'lunch_end', 'check_out')
 
 
 class HrAttendanceLunch(HrAttendance):
+
+    @http.route('/almx_lunch_time/kiosk_app', type='http', auth='user')
+    def kiosk_app(self):
+        """Kiosko dentro de la app móvil. A diferencia de la ruta estándar, no cierra
+        la sesión: la app la necesita para seguir abierta alrededor del kiosko."""
+        if not request.env.user.has_group('hr_attendance.group_hr_attendance_user'):
+            return request.not_found()
+        company = request.env.company.sudo()
+        departments = request.env['hr.department'].with_context(
+            allowed_company_ids=[company.id],
+        ).sudo().search_read(
+            domain=[('company_id', '=', company.id)],
+            fields=['id', 'name', 'total_employee'],
+        )
+        return request.render('hr_attendance.public_kiosk_mode', {
+            'kiosk_backend_info': {
+                'token': company.attendance_kiosk_key,
+                'company_id': company.id,
+                'company_name': company.name,
+                'departments': [
+                    {'id': dep['id'], 'name': dep['name'], 'count': dep['total_employee']}
+                    for dep in departments
+                ],
+                'kiosk_mode': company.attendance_kiosk_mode,
+                'from_trial_mode': False,
+                'barcode_source': company.attendance_barcode_source,
+                'device_tracking_enabled': company.attendance_device_tracking,
+                'lang': py_to_js_locale(company.partner_id.lang or company.env.lang),
+                'server_version_info': exp_version().get('server_version_info'),
+            },
+        })
 
     @http.route()
     def employees_infos(self, token, limit, offset, domain):
