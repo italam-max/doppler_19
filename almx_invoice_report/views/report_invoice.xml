@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document_almx" inherit_id="l10n_mx_edi.report_invoice_document">
+
+        <!-- Estilos (compatibles con wkhtmltopdf: sin flex-wrap) -->
+        <xpath expr="//div[@id='informations']" position="before">
+            <style>
+                #informations { display: block !important; }
+                #informations > div {
+                    display: inline-block !important;
+                    width: 24% !important; max-width: 24% !important;
+                    vertical-align: top; margin-bottom: 10px; padding-right: 10px;
+                }
+                table[name='invoice_line_table'] { font-size: 0.88em; }
+                .almx_sat_line { font-size: 0.8em; color: #6c757d; margin-top: 3px; }
+                div[name='comment'] { font-size: 0.72em; line-height: 1.35; }
+            </style>
+        </xpath>
+
+        <!-- Datos fiscales: Referencia solo si es distinta del Origen (SO) -->
+        <xpath expr="//div[@name='reference']" position="attributes">
+            <attribute name="t-if">o.ref and o.ref != o.invoice_origin</attribute>
+        </xpath>
+
+        <!-- Descripción ancha -->
+        <xpath expr="//th[@name='th_description']" position="attributes">
+            <attribute name="style">width: 50%;</attribute>
+        </xpath>
+
+        <!-- Claves SAT, unidad e impuestos pasan a una línea gris dentro de la descripción -->
+        <xpath expr="//td[@name='account_invoice_line_name']" position="inside">
+            <t t-set="almx_taxes" t-value="', '.join([(t.invoice_label or t.name) for t in line.tax_ids])"/>
+            <t t-set="almx_sat_prod" t-value="line._get_product_unspsc_code()"/>
+            <t t-set="almx_sat_uom" t-value="line._get_uom_unspsc_code()"/>
+            <div class="almx_sat_line">
+                <t t-if="almx_sat_prod">Clave SAT <t t-out="almx_sat_prod"/></t>
+                <t t-if="almx_sat_uom"> · Unidad <t t-out="almx_sat_uom"/></t>
+                <t t-if="almx_taxes"> · <t t-out="almx_taxes"/></t>
+            </div>
+        </xpath>
+
+        <!-- Se ocultan las columnas que ahora van en la descripción -->
+        <xpath expr="//th[@name='th_product_unspsc_code']" position="attributes">
+            <attribute name="class">d-none</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_product_unspsc_code']" position="attributes">
+            <attribute name="class">d-none</attribute>
+            <attribute name="t-attf-class">d-none</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_product_uom_unspsc_code']" position="attributes">
+            <attribute name="class">d-none</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_product_uom_unspsc_code']" position="attributes">
+            <attribute name="class">d-none</attribute>
+            <attribute name="t-attf-class">d-none</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_taxes']" position="attributes">
+            <attribute name="class">d-none</attribute>
+            <attribute name="t-attf-class">d-none</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_taxes']" position="attributes">
+            <attribute name="class">d-none</attribute>
+            <attribute name="t-attf-class">d-none</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_taxes_grouped']" position="attributes">
+            <attribute name="class">d-none</attribute>
+            <attribute name="t-attf-class">d-none</attribute>
+        </xpath>
+
+    </template>
+</odoo>
