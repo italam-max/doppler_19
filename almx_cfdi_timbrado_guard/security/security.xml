@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="group_timbrar_cfdi" model="res.groups">
+            <field name="name">Puede timbrar CFDI (Finanzas)</field>
+            <field name="comment">Puede enviar (timbrar) facturas de cliente registradas que aún no tienen Folio Fiscal.</field>
+        </record>
+    </data>
+</odoo>
