@@ -1,6 +1,6 @@
 {
     'name': 'Alamex - Ajustes de migración 16 → 19',
-    'version': '19.0.1.0.4',
+    'version': '19.0.1.0.5',
     'summary': 'Recupera en Odoo 19 la funcionalidad de 16 que se perdió en la migración',
     'description': """
 Ajustes detectados en la validación por áreas (oct 2026):
@@ -11,7 +11,8 @@ Ajustes detectados en la validación por áreas (oct 2026):
 * Tiempo personal: doble aprobación obligatoria en dos pasos, respaldo de RH,
   sin autoaprobación y tipos restringidos para empleados.
 * Soporte: cada usuario ve solo sus tickets; grupo para ver todas las mesas.
-* Proyectos: secciones Fechas y estatus y Documentos de la tarea (almx_project).
+* Proyectos: secciones Fechas y estatus y Documentos de la tarea (almx_project);
+  lectura de Roles del proyecto para todo usuario interno (tareas creadas desde ventas).
 * Reclutamiento: método de la plantilla Job Offer y formulario de postulación.
 * Empleados: fechas de ingreso / salida / motivo y datos SAT-IMSS de consulta.
 * Productos: grupos para ver precios y costos (antes en doppler y sale_order_invoice).
@@ -34,6 +35,7 @@ Ajustes detectados en la validación por áreas (oct 2026):
     'data': [
         'security/groups.xml',
         'security/rules.xml',
+        'security/ir.model.access.csv',
         'views/approval_views.xml',
         'views/hr_leave_views.xml',
         'views/hr_employee_views.xml',
