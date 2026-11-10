@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Lectura de productos ya la tiene todo usuario interno (base.group_user);
+         este grupo solo controla quién ve la app de catálogo. -->
+    <record id="group_product_catalog" model="res.groups">
+        <field name="name">Consulta de catálogo de productos</field>
+        <field name="comment">Ve nombre, SKU / número de parte, código de barras, categoría e imagen de los productos. Sin precios, costos, existencias ni ubicaciones.</field>
+    </record>
+</odoo>

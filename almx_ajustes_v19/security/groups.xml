@@ -27,4 +27,10 @@
         <field name="name">Alamex: Puede ver costo de producto</field>
         <field name="comment">Ve el costo de producto en las vistas que lo restringen a este grupo.</field>
     </record>
+
+    <!-- Aprobaciones: el responsable lo define la categoría; solo este grupo lo cambia -->
+    <record id="group_approval_change_responsible" model="res.groups">
+        <field name="name">Aprobaciones: puede cambiar el responsable</field>
+        <field name="comment">IT y Dirección (Sammer y Hamdi). Los demás usuarios no pueden cambiar el responsable que asigna la categoría.</field>
+    </record>
 </odoo>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vistas propias (prioridad alta) para no alterar las vistas estándar de producto -->
+
+    <record id="almx_product_catalog_search" model="ir.ui.view">
+        <field name="name">product.template.search.almx.catalog</field>
+        <field name="model">product.template</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <search string="Catálogo de productos">
+                <field name="name" string="Producto / SKU / Código de barras"
+                       filter_domain="['|', '|', '|', ('name', 'ilike', self), ('default_code', 'ilike', self), ('product_variant_ids.default_code', 'ilike', self), ('barcode', 'ilike', self)]"/>
+                <field name="default_code" string="SKU / Número de parte"
+                       filter_domain="['|', ('default_code', 'ilike', self), ('product_variant_ids.default_code', 'ilike', self)]"/>
+                <field name="categ_id" operator="child_of"/>
+                <group>
+                    <filter name="group_categ" string="Categoría" context="{'group_by': 'categ_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="almx_product_catalog_kanban" model="ir.ui.view">
+        <field name="name">product.template.kanban.almx.catalog</field>
+        <field name="model">product.template</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <kanban create="0" edit="0" delete="0" import="0" sample="0">
+                <templates>
+                    <t t-name="card" class="flex-row">
+                        <aside class="o_kanban_aside_full">
+                            <field name="image_128" widget="image" options="{'img_class': 'object-fit-contain w-100 h-100'}"/>
+                        </aside>
+                        <main class="ms-2">
+                            <field name="name" class="fw-bold fs-5"/>
+                            <span t-if="record.default_code.raw_value">SKU: <field name="default_code"/></span>
+                            <field name="categ_id" class="text-muted"/>
+                        </main>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="almx_product_catalog_list" model="ir.ui.view">
+        <field name="name">product.template.list.almx.catalog</field>
+        <field name="model">product.template</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0" import="0" export_xlsx="0">
+                <field name="default_code" string="SKU / Número de parte"/>
+                <field name="name"/>
+                <field name="barcode" optional="show"/>
+                <field name="categ_id" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="almx_product_catalog_form" model="ir.ui.view">
+        <field name="name">product.template.form.almx.catalog</field>
+        <field name="model">product.template</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0" duplicate="0">
+                <sheet>
+                    <field name="product_variant_count" invisible="1"/>
+                    <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}" readonly="1"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="default_code" string="SKU / Número de parte" readonly="1"/>
+                            <field name="barcode" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="categ_id" readonly="1"/>
+                            <field name="uom_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook invisible="product_variant_count &lt;= 1">
+                        <page string="Variantes" name="variants">
+                            <!-- no_open: evita abrir la ficha estándar de la variante (muestra precios) -->
+                            <field name="product_variant_ids" readonly="1">
+                                <list create="0" delete="0" no_open="1">
+                                    <field name="default_code" string="SKU / Número de parte"/>
+                                    <field name="product_template_attribute_value_ids" widget="many2many_tags" string="Atributos"/>
+                                    <field name="barcode"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_almx_product_catalog" model="ir.actions.act_window">
+        <field name="name">Catálogo de productos</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="almx_product_catalog_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Busca un producto por nombre, SKU o código de barras</p>
+        </field>
+    </record>
+
+    <record id="action_almx_product_catalog_kanban" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="almx_product_catalog_kanban"/>
+        <field name="act_window_id" ref="action_almx_product_catalog"/>
+    </record>
+    <record id="action_almx_product_catalog_list" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="almx_product_catalog_list"/>
+        <field name="act_window_id" ref="action_almx_product_catalog"/>
+    </record>
+    <record id="action_almx_product_catalog_form" model="ir.actions.act_window.view">
+        <field name="sequence">3</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="almx_product_catalog_form"/>
+        <field name="act_window_id" ref="action_almx_product_catalog"/>
+    </record>
+
+    <menuitem id="menu_almx_product_catalog_root"
+              name="Catálogo de productos"
+              web_icon="almx_product_catalog,static/description/icon.png"
+              groups="almx_product_catalog.group_product_catalog,base.group_system"
+              sequence="60"/>
+    <menuitem id="menu_almx_product_catalog"
+              name="Productos"
+              parent="menu_almx_product_catalog_root"
+              action="action_almx_product_catalog"
+              sequence="1"/>
+</odoo>

@@ -5,7 +5,7 @@ validación por áreas del 22 oct 2026.
 
 | Área | Qué hace |
 |---|---|
-| Aprobaciones | Campo **Responsable** (solicitud y categoría) con regla de acceso; estado **Hecho** con botón *Marcar como hecho*, filtro y columna; **grupos de lectura** por categoría. Reemplaza al módulo `doppler` (Vauxoo). |
+| Aprobaciones | Campo **Responsable** = quien ejecuta (solicitud y categoría) con regla de acceso; lo fija la categoría y solo el grupo **"Aprobaciones: puede cambiar el responsable"** lo edita; al aprobarse se le crea la actividad **"Aplicar solicitud aprobada"**, que se cierra con *Marcar como hecho*; campo Contacto como **"Contacto / Proveedor"**; estado **Hecho** con botón *Marcar como hecho*, filtro y columna; **grupos de lectura** por categoría. Reemplaza al módulo `doppler` (Vauxoo). |
 | Tiempo personal | Doble aprobación siempre en **dos pasos** (en 19 RH validaba en un clic); el jefe da el primero y RH puede darlo de respaldo (queda nota en el chatter); **nadie aprueba su propia ausencia**; tipos **"Solo RH"**: los empleados solo ven Trabajo fuera de oficina, Falta justificada con goce (70), Falta justificada sin goce y Vacaciones. |
 | Soporte | Regla nativa regresada al criterio de 16: cada usuario ve **solo sus tickets**. Grupo **"Soporte: ver todas las mesas"** para IT, Calidad y Dirección. Grupo Administrador solo para IT. |
 | Almuerzos | Lista de pedidos editable en línea con **precio editable** (solo Responsable de almuerzos). |

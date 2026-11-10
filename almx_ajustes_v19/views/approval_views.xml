@@ -16,9 +16,18 @@
             <xpath expr="//header/field[@name='request_status']" position="attributes">
                 <attribute name="statusbar_visible">new,pending,approved,done,refused</attribute>
             </xpath>
+            <!-- Responsable: fijo para el usuario; editable solo por IT / Dirección -->
             <xpath expr="//field[@name='category_id']" position="after">
-                <field name="responsible_id" readonly="request_status != 'new'" force_save="1"
-                       widget="many2one_avatar_user"/>
+                <field name="responsible_id" readonly="1" force_save="1"
+                       widget="many2one_avatar_user"
+                       groups="!almx_ajustes_v19.group_approval_change_responsible"/>
+                <field name="responsible_id" force_save="1"
+                       readonly="request_status in ('done', 'cancel')"
+                       widget="many2one_avatar_user"
+                       groups="almx_ajustes_v19.group_approval_change_responsible"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="string">Contacto / Proveedor</attribute>
             </xpath>
         </field>
     </record>

@@ -14,6 +14,8 @@ RH = ['berenice.s@alam.mx', 'angel.a@alam.mx']
 HELPDESK_ALL_TEAMS = IT + CALIDAD + DIRECCION
 # Soporte: solo IT conserva el grupo Administrador (configuración de mesas)
 HELPDESK_ADMINS = IT
+# Aprobaciones: pueden cambiar el responsable
+APPROVAL_CHANGE_RESPONSIBLE = ['italam@alam.mx', 'hamdi@alam.mx']
 # Tiempo personal: pueden usar todos los tipos
 LEAVE_ALL_TYPES = RH + IT + DIRECCION
 
@@ -82,6 +84,7 @@ def _website_recruitment(env):
 def post_init_hook(env):
     _add_users(env, 'almx_ajustes_v19.group_helpdesk_all_teams', HELPDESK_ALL_TEAMS)
     _add_users(env, 'almx_ajustes_v19.group_leave_all_types', LEAVE_ALL_TYPES)
+    _add_users(env, 'almx_ajustes_v19.group_approval_change_responsible', APPROVAL_CHANGE_RESPONSIBLE)
     _cleanup_helpdesk_admins(env)
     _leave_types(env)
     _website_recruitment(env)
