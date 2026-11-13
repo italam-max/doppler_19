@@ -187,8 +187,21 @@ class StockPicking(models.Model):
                         continue
                     op = cmd[0]
                     data = cmd[2] if len(cmd) > 2 and isinstance(cmd[2], dict) else {}
-                    if op in (0, 2, 3, 5, 6) or (op == 1 and ({'product_id', 'product_uom_qty'} & set(data))):
+                    move = self.env['stock.move'].browse(cmd[1]) if op in (1, 2, 3) and cmd[1] else self.env['stock.move']
+                    # Material de obra (líneas sin línea de venta, surtidas en un PICK
+                    # manual): en el OUT se puede quitar o reducir lo que no salga.
+                    # Lo que viene de la SO sigue congelado y no se puede agregar nada.
+                    loose = bool(move) and not move.sale_line_id
+                    if op in (0, 5, 6):
                         raise UserError(frozen[0]._almx_freeze_message())
+                    if op in (2, 3) and not loose:
+                        raise UserError(frozen[0]._almx_freeze_message())
+                    if op == 1:
+                        if 'product_id' in data:
+                            raise UserError(frozen[0]._almx_freeze_message())
+                        if 'product_uom_qty' in data and not (
+                                loose and move.product_uom.compare(data['product_uom_qty'], move.product_uom_qty) <= 0):
+                            raise UserError(frozen[0]._almx_freeze_message())
         return super().write(vals)
 
     def button_validate(self):

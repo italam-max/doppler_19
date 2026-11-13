@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- almx_stock_extends usa attrs=, que Odoo 19 ignora: los botones se veían siempre. -->
+    <record id="view_picking_form_almx_create_out" model="ir.ui.view">
+        <field name="name">stock.picking.form.almx.create.out</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="almx_stock_extends.stock_picking_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_create_related_out']" position="attributes">
+                <attribute name="attrs"></attribute>
+                <attribute name="groups">almx_stock_extends.group_almx_manual_out_creator</attribute>
+                <attribute name="invisible">not almx_is_pick or state != 'done' or almx_has_out</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_create_related_int']" position="attributes">
+                <attribute name="attrs"></attribute>
+                <attribute name="invisible">state != 'done' or picking_type_code != 'incoming'</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_create_related_out']" position="after">
+                <field name="almx_has_out" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

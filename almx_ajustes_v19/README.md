@@ -10,7 +10,6 @@ validación por áreas del 22 oct 2026.
 | Soporte | Regla nativa regresada al criterio de 16: cada usuario ve **solo sus tickets**. Grupo **"Soporte: ver todas las mesas"** para IT, Calidad y Dirección. Grupo Administrador solo para IT. |
 | Almuerzos | Lista de pedidos editable en línea con **precio editable** (solo Responsable de almuerzos). |
 | Reclutamiento | Método `format_date_to_tz` para la plantilla **Job Offer (AADM-MX-RH-FO-009)**; archiva la copia vieja del formulario de postulación; elimina el script huérfano de reCAPTCHA (OCA). |
-| Proyectos | Lectura de **Roles del proyecto** (`project.role`, nuevo en 19) para todo usuario interno: quien crea tareas sin ser usuario de Proyecto (p. ej. Ventas en *Inspecciones (Modernizaciones)*) ya no ve error de acceso. |
 | Empleados | **Fecha de ingreso, salida y motivo** juntos en la pestaña Trabajo; pestaña **Datos SAT / IMSS** de solo consulta. |
 
 ## Instalación (staging de Odoo.sh)

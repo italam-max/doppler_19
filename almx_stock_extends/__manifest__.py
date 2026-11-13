@@ -11,10 +11,6 @@ Cuando son creados manualmente, se crea un campo many2one para que se pueda sele
 
 Changelog
 ----------
-- 19.0.1.0.14: Lista de traslados con Desde, A, Fecha prevista, Tipo de
-  operación, Agrupación y Compañía ocultas por defecto (petición de
-  Dirección); siguen disponibles en el selector de columnas. Se agrega
-  stock_picking_batch a depends por la columna Agrupación (batch_id).
 - 19.0.1.0.13: Autoenlace PICK/OUT reescrito para 19. Odoo 19 eliminó
   group_id (grupos de abastecimiento), así que el emparejamiento por
   grupo tronaba en silencio y ningún PICK/OUT nuevo quedaba ligado (ni
@@ -215,10 +211,10 @@ Changelog
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Inventory',
-    'version': '19.0.1.0.14',
+    'version': '19.0.1.0.13',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','stock','sale','almx_stock','stock_picking_batch'],
+    'depends': ['base','stock','sale','almx_stock'],
 
     # always loaded
     'data': [
@@ -227,7 +223,6 @@ Changelog
         'views/views.xml',
         'views/templates.xml',
         'views/stock_view.xml',
-        'views/stock_picking_list_columns.xml',
         'views/sale_view.xml',
         'data/almx_cron.xml',
     ],

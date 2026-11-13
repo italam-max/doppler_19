@@ -1,6 +1,6 @@
 {
     'name': 'ALMX - Candados de Movimientos de Inventario',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.2.0',
     'summary': 'Todo movimiento con documento: SO en PICK/OUT, PO o devolución en IN, '
                'Dirección para Merma/Laboratorio/Desecho, asignaciones solo TI/RH',
     'description': """

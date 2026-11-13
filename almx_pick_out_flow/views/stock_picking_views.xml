@@ -18,11 +18,22 @@
                 <attribute name="invisible">picking_type_code != 'outgoing' and not almx_is_pick</attribute>
                 <attribute name="readonly">state in ('done', 'cancel') or almx_lock_url_laboratorio</attribute>
             </field>
+            <field name="x_studio_url_calidad" position="attributes">
+                <attribute name="invisible">picking_type_code not in ('outgoing', 'incoming') and not almx_is_pick</attribute>
+                <attribute name="readonly">state in ('done', 'cancel') or almx_lock_url_calidad</attribute>
+            </field>
             <field name="x_studio_url_calidad" position="after">
                 <field name="almx_is_pick" invisible="1"/>
                 <field name="almx_lock_url_almacen" invisible="1"/>
                 <field name="almx_lock_url_bodega" invisible="1"/>
                 <field name="almx_lock_url_laboratorio" invisible="1"/>
+                <field name="almx_lock_url_calidad" invisible="1"/>
+                <field name="almx_require_comprobante" invisible="1"/>
+                <field name="x_studio_comprobante_filename" invisible="1"/>
+                <field name="x_studio_comprobante" string="Comprobante" filename="x_studio_comprobante_filename"
+                       invisible="picking_type_code != 'outgoing'" readonly="state in ('done', 'cancel')"/>
+                <field name="almx_comprobante_user_id" invisible="not x_studio_comprobante or not almx_comprobante_user_id"/>
+                <field name="almx_comprobante_date" invisible="not x_studio_comprobante or not almx_comprobante_date"/>
             </field>
         </field>
     </record>
