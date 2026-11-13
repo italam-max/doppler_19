@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Igual que en 16: bloque debajo del encabezado principal del candidato -->
+    <record id="hr_applicant_view_form_almx_psicometria" model="ir.ui.view">
+        <field name="name">hr.applicant.form.almx.psicometria</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group[1]" position="after">
+                <group name="almx_psychological_assessments"
+                       groups="hr_recruitment.group_hr_recruitment_user">
+                    <group name="almx_psychological_assessments_left" string="Evaluaciones psicológicas">
+                        <field name="almx_machover" filename="almx_machover_filename"/>
+                        <field name="almx_machover_filename" invisible="1"/>
+                        <field name="almx_man_in_rain" filename="almx_man_in_rain_filename"/>
+                        <field name="almx_man_in_rain_filename" invisible="1"/>
+                        <field name="almx_zavic" filename="almx_zavic_filename"/>
+                        <field name="almx_zavic_filename" invisible="1"/>
+                        <field name="almx_psychometric_test" filename="almx_psychometric_test_filename"/>
+                        <field name="almx_psychometric_test_filename" invisible="1"/>
+                    </group>
+                    <group name="almx_psychological_assessments_right" string="Resultados de evaluaciones">
+                        <field name="almx_iq"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Entrevista presencial: reemplaza el "Start Interview" de 16 -->
+    <record id="hr_applicant_view_form_almx_entrevista" model="ir.ui.view">
+        <field name="name">hr.applicant.form.almx.entrevista</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_print_survey']" position="before">
+                <button name="action_almx_start_interview" type="object" class="oe_stat_button"
+                        icon="fa-user" help="El entrevistador llena el formulario de entrevista del puesto"
+                        invisible="not active or not survey_id"
+                        groups="hr_recruitment.group_hr_recruitment_interviewer">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Iniciar</span>
+                        <span class="o_stat_text">entrevista</span>
+                    </div>
+                </button>
+            </xpath>
+            <!-- No se envía la entrevista al candidato: se llena en presencial -->
+            <xpath expr="//button[@name='action_send_survey']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
