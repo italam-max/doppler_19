@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_almx_purchase_sale_copy,almx.purchase.sale.copy,model_almx_purchase_sale_copy,group_purchase_from_sale,1,1,1,1
+access_almx_purchase_sale_copy_line,almx.purchase.sale.copy.line,model_almx_purchase_sale_copy_line,group_purchase_from_sale,1,1,1,1

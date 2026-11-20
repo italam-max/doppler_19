@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="almx_purchase_sale_copy_form" model="ir.ui.view">
+        <field name="name">almx.purchase.sale.copy.form</field>
+        <field name="model">almx.purchase.sale.copy</field>
+        <field name="arch" type="xml">
+            <form string="Copiar equipo de la venta">
+                <div class="alert alert-info" role="alert">
+                    Trae los productos tal como los configuró Ventas. Si al
+                    proveedor se le pide distinto, después ajusta la línea con
+                    el lápiz (Editar configuración).
+                </div>
+                <group>
+                    <field name="purchase_id" invisible="1"/>
+                    <field name="sale_ref" placeholder="SO64166"/>
+                    <field name="sale_info"/>
+                    <field name="partner_id" invisible="purchase_id"
+                           required="not purchase_id"
+                           options="{'no_create': True}"
+                           context="{'res_partner_search_mode': 'supplier'}"/>
+                </group>
+                <field name="line_ids" nolabel="1">
+                    <list editable="bottom" create="0" delete="0">
+                        <field name="selected" widget="boolean_toggle"/>
+                        <field name="product_id" readonly="1" force_save="1"/>
+                        <field name="description" optional="hide"/>
+                        <field name="product_uom_qty"/>
+                        <field name="uom_id" readonly="1" force_save="1"/>
+                        <field name="sale_line_ref" column_invisible="1"/>
+                        <field name="no_variant_ptav_ids" column_invisible="1" force_save="1"/>
+                        <field name="custom_text" column_invisible="1"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_apply" type="object" string="Agregar a la compra"
+                            class="btn-primary" invisible="not purchase_id"/>
+                    <button name="action_apply" type="object" string="Crear solicitud de compra"
+                            class="btn-primary" invisible="purchase_id"/>
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="almx_purchase_order_form_copy_sale" model="ir.ui.view">
+        <field name="name">purchase.order.form.almx.copy.sale</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_almx_copy_from_sale" type="object"
+                        string="Copiar equipo de la venta"
+                        groups="almx_purchase_configurator.group_purchase_from_sale"
+                        invisible="state not in ('draft', 'sent')"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="almx_sale_order_form_create_purchase" model="ir.ui.view">
+        <field name="name">sale.order.form.almx.create.purchase</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_almx_create_purchase" type="object"
+                        string="Crear solicitud de compra"
+                        groups="almx_purchase_configurator.group_purchase_from_sale"
+                        invisible="state == 'cancel' or sale_type != 'project'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_almx_purchase_from_sale" model="ir.actions.act_window">
+        <field name="name">Crear PO desde venta</field>
+        <field name="res_model">almx.purchase.sale.copy</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_almx_purchase_from_sale"
+              name="Crear PO desde venta"
+              parent="purchase.menu_procurement_management"
+              action="action_almx_purchase_from_sale"
+              groups="almx_purchase_configurator.group_purchase_from_sale"
+              sequence="7"/>
+</odoo>

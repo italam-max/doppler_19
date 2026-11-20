@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_purchase_from_sale" model="res.groups">
+        <field name="name">Compras: crear PO desde venta</field>
+        <field name="comment">Pueden crear solicitudes de compra con el equipo de una venta (Leonel, Martha, Angélica, IT y Hamdi).</field>
+    </record>
+</odoo>

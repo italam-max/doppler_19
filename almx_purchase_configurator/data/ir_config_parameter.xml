@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="param_matrix_limit" model="ir.config_parameter">
+        <field name="key">almx_purchase_configurator.matrix_limit</field>
+        <field name="value">200</field>
+    </record>
+</odoo>
