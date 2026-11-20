@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_almx_shipping_method_wizard_form" model="ir.ui.view">
+        <field name="name">almx.shipping.method.wizard.form</field>
+        <field name="model">almx.shipping.method.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Método de envío">
+                <field name="order_id" invisible="1"/>
+                <field name="sale_type" invisible="1"/>
+                <field name="almx_shipping_kind" invisible="1"/>
+                <field name="needs_address" invisible="1"/>
+                <field name="needs_fiscal" invisible="1"/>
+                <field name="from_select" invisible="1"/>
+                <field name="addr_commercial_id" invisible="1"/>
+                <field name="fis_partner_id" invisible="1"/>
+                <group string="¿Cómo sale el material?">
+                    <field name="carrier_id" required="1" readonly="from_select" force_save="1" options="{'no_create': True, 'no_open': True}"
+                           domain="[('almx_shipping_kind', 'in', sale_type == 'project' and ['paqueteria', 'flete', 'inmediata', 'recoleccion', 'app', 'proyecto'] or ['paqueteria', 'flete', 'inmediata', 'recoleccion', 'app'])]"/>
+                    <field name="almx_paqueteria" invisible="almx_shipping_kind != 'paqueteria'" required="almx_shipping_kind == 'paqueteria'"/>
+                    <field name="almx_paqueteria_otra" invisible="almx_shipping_kind != 'paqueteria' or almx_paqueteria != 'otra'"
+                           required="almx_shipping_kind == 'paqueteria' and almx_paqueteria == 'otra'" placeholder="¿Por cuál paquetería?"/>
+                    <field name="almx_tipo_servicio" widget="radio" options="{'horizontal': true}"
+                           invisible="almx_shipping_kind != 'paqueteria'" required="almx_shipping_kind == 'paqueteria'"/>
+                    <field name="almx_sucursal_destino" invisible="almx_shipping_kind != 'paqueteria' or almx_tipo_servicio != 'ocurre'" placeholder="Opcional"/>
+                    <field name="almx_contacto_nombre" invisible="almx_shipping_kind != 'flete'" required="almx_shipping_kind == 'flete'"/>
+                    <field name="almx_contacto_telefono" widget="phone" invisible="almx_shipping_kind != 'flete'" required="almx_shipping_kind == 'flete'"/>
+                    <field name="collect_date" invisible="almx_shipping_kind != 'recoleccion'" required="almx_shipping_kind == 'recoleccion'"/>
+                    <field name="almx_app_servicio" widget="radio" options="{'horizontal': true}"
+                           invisible="almx_shipping_kind != 'app'" required="almx_shipping_kind == 'app'"/>
+                    <field name="almx_app_otra" invisible="almx_shipping_kind != 'app' or almx_app_servicio != 'otra'"
+                           required="almx_shipping_kind == 'app' and almx_app_servicio == 'otra'" placeholder="¿Cuál app?"/>
+                    <field name="almx_app_referencia" invisible="almx_shipping_kind != 'app'" required="almx_shipping_kind == 'app'"
+                           placeholder="Placas, conductor o folio del viaje"/>
+                </group>
+                <group string="Dirección de entrega" invisible="not needs_address">
+                    <field name="addr_mode" widget="radio" options="{'horizontal': true}" required="needs_address"/>
+                    <field name="addr_partner_id" invisible="addr_mode != 'existing'" required="needs_address and addr_mode == 'existing'" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="addr_display" widget="text" invisible="addr_mode != 'existing' or not addr_partner_id"/>
+                    <field name="addr_name" invisible="addr_mode != 'new'" required="needs_address and addr_mode == 'new'" placeholder="Ej. Obra Torre Norte / Juan Pérez"/>
+                    <field name="addr_street_name" invisible="addr_mode != 'new'" required="needs_address and addr_mode == 'new'"/>
+                    <field name="addr_street_number" invisible="addr_mode != 'new'" required="needs_address and addr_mode == 'new'"/>
+                    <field name="addr_street_number2" invisible="addr_mode != 'new'" placeholder="Opcional"/>
+                    <field name="addr_colony" invisible="addr_mode != 'new'" required="needs_address and addr_mode == 'new'"/>
+                    <field name="addr_city" invisible="addr_mode != 'new'" required="needs_address and addr_mode == 'new'"/>
+                    <field name="addr_state_id" invisible="addr_mode != 'new'" required="needs_address and addr_mode == 'new'" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="addr_zip" invisible="addr_mode != 'new'" required="needs_address and addr_mode == 'new'"/>
+                    <field name="addr_phone" widget="phone" invisible="addr_mode != 'new'"/>
+                    <field name="addr_reference" invisible="addr_mode != 'new'" placeholder="Entre calles, color de fachada, horario de recepción"/>
+                </group>
+                <group string="Datos fiscales del cliente (los pide la paquetería)" invisible="not needs_fiscal">
+                    <field name="fis_name" required="needs_fiscal"/>
+                    <field name="fis_vat" required="needs_fiscal"/>
+                    <field name="fis_regime" required="needs_fiscal"/>
+                    <field name="fis_zip" required="needs_fiscal"/>
+                    <field name="fis_csf_filename" invisible="1"/>
+                    <field name="fis_csf" filename="fis_csf_filename"/>
+                </group>
+                <footer>
+                    <button name="action_apply" type="object" string="Guardar" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancelar" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_almx_shipping_address_wizard_form" model="ir.ui.view">
+        <field name="name">almx.shipping.address.wizard.form</field>
+        <field name="model">almx.shipping.address.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Dirección de entrega">
+                <field name="order_id" invisible="1"/>
+                <field name="addr_commercial_id" invisible="1"/>
+                <div class="alert alert-info" role="alert">
+                    Esta ventana solo cambia la dirección de entrega. La dirección fiscal del cliente no se modifica.
+                </div>
+                <group>
+                    <field name="addr_mode" widget="radio" options="{'horizontal': true}" required="True"/>
+                    <field name="addr_partner_id" invisible="addr_mode != 'existing'" required="True and addr_mode == 'existing'" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="addr_display" widget="text" invisible="addr_mode != 'existing' or not addr_partner_id"/>
+                    <field name="addr_name" invisible="addr_mode != 'new'" required="True and addr_mode == 'new'" placeholder="Ej. Obra Torre Norte / Juan Pérez"/>
+                    <field name="addr_street_name" invisible="addr_mode != 'new'" required="True and addr_mode == 'new'"/>
+                    <field name="addr_street_number" invisible="addr_mode != 'new'" required="True and addr_mode == 'new'"/>
+                    <field name="addr_street_number2" invisible="addr_mode != 'new'" placeholder="Opcional"/>
+                    <field name="addr_colony" invisible="addr_mode != 'new'" required="True and addr_mode == 'new'"/>
+                    <field name="addr_city" invisible="addr_mode != 'new'" required="True and addr_mode == 'new'"/>
+                    <field name="addr_state_id" invisible="addr_mode != 'new'" required="True and addr_mode == 'new'" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="addr_zip" invisible="addr_mode != 'new'" required="True and addr_mode == 'new'"/>
+                    <field name="addr_phone" widget="phone" invisible="addr_mode != 'new'"/>
+                    <field name="addr_reference" invisible="addr_mode != 'new'" placeholder="Entre calles, color de fachada, horario de recepción"/>
+                </group>
+                <footer>
+                    <button name="action_apply" type="object" string="Guardar" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancelar" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_almx_fiscal_data_wizard_form" model="ir.ui.view">
+        <field name="name">almx.fiscal.data.wizard.form</field>
+        <field name="model">almx.fiscal.data.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Datos de facturación">
+                <field name="order_id" invisible="1"/>
+                <field name="fis_partner_id" invisible="1"/>
+                <div class="alert alert-warning" role="alert">
+                    Estos datos se guardan en el cliente y son los que usa Finanzas para timbrar. Deben coincidir con su Constancia de Situación Fiscal.
+                </div>
+                <group>
+                    <group string="Datos fiscales del cliente">
+                    <field name="fis_name" required="True"/>
+                    <field name="fis_vat" required="True"/>
+                    <field name="fis_regime" required="True"/>
+                    <field name="fis_zip" required="True"/>
+                    <field name="fis_csf_filename" invisible="1"/>
+                    <field name="fis_csf" filename="fis_csf_filename"/>
+                    </group>
+                    <group string="¿Cómo se emite la factura?">
+                        <field name="inv_usage" required="1"/>
+                        <field name="inv_payment_method_id" required="1" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="inv_payment_policy" required="1"/>
+                        <field name="inv_cfdi_to_public"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_apply" type="object" string="Guardar" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancelar" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

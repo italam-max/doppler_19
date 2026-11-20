@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="product_envio_almx" model="product.product">
+        <field name="name">Envío (método de entrega)</field>
+        <field name="type">service</field>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="list_price">0</field>
+        <field name="invoice_policy">order</field>
+    </record>
+
+    <record id="carrier_paqueteria" model="delivery.carrier">
+        <field name="name">Paquetería</field>
+        <field name="sequence">1</field>
+        <field name="delivery_type">fixed</field>
+        <field name="fixed_price">0</field>
+        <field name="product_id" ref="product_envio_almx"/>
+        <field name="almx_shipping_kind">paqueteria</field>
+    </record>
+    <record id="carrier_flete" model="delivery.carrier">
+        <field name="name">Flete</field>
+        <field name="sequence">2</field>
+        <field name="delivery_type">fixed</field>
+        <field name="fixed_price">0</field>
+        <field name="product_id" ref="product_envio_almx"/>
+        <field name="almx_shipping_kind">flete</field>
+    </record>
+    <record id="carrier_inmediata" model="delivery.carrier">
+        <field name="name">Entrega inmediata</field>
+        <field name="sequence">3</field>
+        <field name="delivery_type">fixed</field>
+        <field name="fixed_price">0</field>
+        <field name="product_id" ref="product_envio_almx"/>
+        <field name="almx_shipping_kind">inmediata</field>
+    </record>
+    <record id="carrier_recoleccion" model="delivery.carrier">
+        <field name="name">Recolección programada</field>
+        <field name="sequence">4</field>
+        <field name="delivery_type">fixed</field>
+        <field name="fixed_price">0</field>
+        <field name="product_id" ref="product_envio_almx"/>
+        <field name="almx_shipping_kind">recoleccion</field>
+    </record>
+    <record id="carrier_app" model="delivery.carrier">
+        <field name="name">Servicio de app</field>
+        <field name="sequence">5</field>
+        <field name="delivery_type">fixed</field>
+        <field name="fixed_price">0</field>
+        <field name="product_id" ref="product_envio_almx"/>
+        <field name="almx_shipping_kind">app</field>
+    </record>
+    <record id="carrier_proyecto" model="delivery.carrier">
+        <field name="name">Proyecto Alamex</field>
+        <field name="sequence">6</field>
+        <field name="delivery_type">fixed</field>
+        <field name="fixed_price">0</field>
+        <field name="product_id" ref="product_envio_almx"/>
+        <field name="almx_shipping_kind">proyecto</field>
+    </record>
+</odoo>

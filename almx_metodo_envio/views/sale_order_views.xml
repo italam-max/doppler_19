@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_almx_metodo_envio" model="ir.ui.view">
+        <field name="name">sale.order.form.almx_metodo_envio</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <!-- Solo en Refacciones: método de envío, dirección de entrega y datos de facturación se cambian por ventana.
+                 En los demás tipos de venta los campos se comportan como antes. -->
+            <xpath expr="//field[@name='partner_invoice_id']" position="after">
+                <button name="action_almx_open_fiscal_wizard" type="object" string="Datos de facturación" icon="fa-file-text-o"
+                        class="btn-link ps-0" colspan="2"
+                        invisible="sale_type != 'spare' or not partner_id or (state not in ('draft', 'sent') and not is_so_admin)"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
+                <attribute name="readonly">sale_type == 'spare' or state == 'cancel' or locked</attribute>
+                <attribute name="force_save">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                <button name="action_almx_open_address_wizard" type="object" string="Cambiar dirección de entrega" icon="fa-map-marker"
+                        class="btn-link ps-0" colspan="2"
+                        invisible="sale_type != 'spare' or not partner_id or (state not in ('draft', 'sent') and not is_so_admin)"/>
+            </xpath>
+            <xpath expr="//field[@name='carrier_id']" position="attributes">
+                <attribute name="widget">almx_carrier_wizard</attribute>
+                <attribute name="readonly">state != 'draft'</attribute>
+                <attribute name="required">state == 'draft'</attribute>
+                <attribute name="domain">sale_type == 'spare' and [('almx_shipping_kind', 'in', ['paqueteria', 'flete', 'inmediata', 'recoleccion', 'app'])] or [('almx_shipping_kind', 'not in', sale_type != 'project' and ['proyecto'] or [])]</attribute>
+                <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='collect_date']" position="attributes">
+                <attribute name="readonly">sale_type == 'spare'</attribute>
+                <attribute name="required">sale_type != 'spare' and state == 'draft' and is_immediate</attribute>
+            </xpath>
+            <xpath expr="//field[@name='collect_date']" position="after">
+                <field name="almx_shipping_kind" invisible="1"/>
+                <field name="almx_paqueteria" invisible="sale_type != 'spare' or almx_shipping_kind != 'paqueteria'" readonly="1"/>
+                <field name="almx_paqueteria_otra" invisible="sale_type != 'spare' or almx_shipping_kind != 'paqueteria' or almx_paqueteria != 'otra'" readonly="1"/>
+                <field name="almx_tipo_servicio" invisible="sale_type != 'spare' or almx_shipping_kind != 'paqueteria'" readonly="1"/>
+                <field name="almx_sucursal_destino" invisible="sale_type != 'spare' or almx_shipping_kind != 'paqueteria' or almx_tipo_servicio != 'ocurre'" readonly="1"/>
+                <field name="almx_contacto_nombre" invisible="sale_type != 'spare' or almx_shipping_kind != 'flete'" readonly="1"/>
+                <field name="almx_contacto_telefono" widget="phone" invisible="sale_type != 'spare' or almx_shipping_kind != 'flete'" readonly="1"/>
+                <field name="almx_app_servicio" invisible="sale_type != 'spare' or almx_shipping_kind != 'app'" readonly="1"/>
+                <field name="almx_app_otra" invisible="sale_type != 'spare' or almx_shipping_kind != 'app' or almx_app_servicio != 'otra'" readonly="1"/>
+                <field name="almx_app_referencia" invisible="sale_type != 'spare' or almx_shipping_kind != 'app'" readonly="1"/>
+                <button name="action_almx_open_shipping_wizard" type="object" string="Editar datos de envío" icon="fa-truck"
+                        class="btn-link ps-0" colspan="2"
+                        invisible="sale_type != 'spare' or almx_shipping_kind not in ('paqueteria', 'flete', 'recoleccion', 'app') or (state not in ('draft', 'sent') and not is_so_admin)"/>
+            </xpath>
+            <!-- Confirmar desde el botón: en Refacciones, si falta información de envío se abre la ventana. -->
+            <xpath expr="(//button[@name='action_confirm'])[1]" position="attributes">
+                <attribute name="context">{'validate_analytic': True, 'almx_confirm_ui': True}</attribute>
+            </xpath>
+            <xpath expr="(//button[@name='action_confirm'])[2]" position="attributes">
+                <attribute name="context">{'validate_analytic': True, 'almx_confirm_ui': True}</attribute>
+            </xpath>
+            <!-- El envío es informativo en toda la empresa: se ocultan los botones nativos que agregan una línea de costo. -->
+            <xpath expr="(//button[@name='action_open_delivery_wizard'])[1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="(//button[@name='action_open_delivery_wizard'])[2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="(//button[@name='action_open_delivery_wizard'])[3]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

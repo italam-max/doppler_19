@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_chatter_edit" model="res.groups">
+        <field name="name">Chatter: puede editar y eliminar mensajes</field>
+        <field name="comment">Exentos del candado de chatter (Hamdi y Sammer).</field>
+    </record>
+</odoo>

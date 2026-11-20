@@ -6,9 +6,10 @@
         <field name="arch" type="xml">
             <form string="Confirmar números de serie">
                 <div class="alert alert-info" role="alert">
-                    Ingresa el número de serie que vas a entregar físicamente
-                    para cada producto. El sistema lo verificará contra los
-                    números de serie dados de alta antes de permitir validar.
+                    Selecciona el número de serie que vas a entregar
+                    físicamente para cada producto (revisa la etiqueta). La
+                    lista solo muestra series con existencia disponible en la
+                    ubicación de origen.
                 </div>
                 <field name="line_ids">
                     <list editable="bottom" create="false" delete="false"
@@ -16,7 +17,9 @@
                           decoration-danger="validation_message and not is_valid">
                         <field name="product_id" readonly="1"/>
                         <field name="location_id" readonly="1" string="Ubicación de origen"/>
-                        <field name="entered_serial" string="Número de serie a entregar"/>
+                        <field name="allowed_lot_ids" column_invisible="True"/>
+                        <field name="lot_id" string="Número de serie a entregar"
+                               options="{'no_create': True, 'no_open': True}"/>
                         <field name="validation_message" string="Estado"/>
                         <field name="is_valid" column_invisible="True"/>
                         <field name="matched_lot_id" column_invisible="True"/>

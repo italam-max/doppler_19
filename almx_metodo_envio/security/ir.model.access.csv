@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_almx_shipping_method_wizard,almx.shipping.method.wizard,model_almx_shipping_method_wizard,base.group_user,1,1,1,1
+access_almx_shipping_address_wizard,almx.shipping.address.wizard,model_almx_shipping_address_wizard,base.group_user,1,1,1,1
+access_almx_fiscal_data_wizard,almx.fiscal.data.wizard,model_almx_fiscal_data_wizard,base.group_user,1,1,1,1

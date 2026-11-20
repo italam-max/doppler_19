@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ALMX Serial Verification on Validate',
-    'version': '19.0.1.1.0',
-    'summary': 'Al validar un traslado, pide capturar manualmente el número de serie a entregar y lo verifica contra los números de serie dados de alta antes de proceder.',
+    'version': '19.0.1.2.0',
+    'summary': 'Al validar un traslado, pide seleccionar de una lista el número de serie a entregar y lo verifica contra las existencias antes de proceder.',
     'description': """
 ALMX Serial Verification on Validate
 =======================================
 
 Changelog
 ----------
+- 19.0.1.2.0: La serie ya no se escribe a mano: se selecciona de una lista
+  con las series del producto que tienen existencia libre en la ubicación
+  de origen (incluye sububicaciones) más la que ya tiene reservada la
+  línea, sin distinguirla. La verificación server-side se mantiene.
 - 19.0.1.1.0: Port a Odoo 19.
   - qty_done / reserved_uom_qty -> quantity + picked (modelo de 19). Al
     confirmar se escribe el número de serie y se marca la línea "picked".
@@ -69,12 +73,11 @@ Qué hace este módulo
    de operación (normalmente solo en "Recogida").
 2. Al presionar "Validar" en un traslado de ese tipo que tenga productos
    con número de serie, en vez de validar directamente se abre una
-   ventana pidiendo ingresar, para cada producto, el número de serie que
-   se va a entregar (el campo empieza VACÍO, no se muestra el número que
-   el sistema reservó automáticamente, precisamente para obligar a mirar
-   la etiqueta física en vez de copiar lo que ya estaba puesto).
-3. Al escribir el número, el sistema lo verifica en el momento contra los
-   números de serie dados de alta para ese producto:
+   ventana pidiendo seleccionar, para cada producto, el número de serie
+   que se va a entregar. La lista muestra las series con existencia libre
+   en la ubicación de origen; el campo empieza VACÍO y la serie reservada
+   no se distingue, para obligar a mirar la etiqueta física.
+3. Al seleccionar el número, el sistema lo verifica en el momento:
    - Si no existe -> "Número de serie no encontrado para este producto".
    - Si existe pero no hay existencia disponible en la ubicación de
      origen del movimiento -> mensaje indicando que no hay existencia ahí.
