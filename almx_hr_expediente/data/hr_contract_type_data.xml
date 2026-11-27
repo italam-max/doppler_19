@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="contract_type_indeterminado" model="hr.contract.type">
+        <field name="name">Tiempo indeterminado</field>
+    </record>
+    <record id="contract_type_indeterminado_prueba" model="hr.contract.type">
+        <field name="name">Indeterminado con periodo de prueba</field>
+    </record>
+    <record id="contract_type_determinado" model="hr.contract.type">
+        <field name="name">Tiempo determinado</field>
+    </record>
+    <record id="contract_type_jcf" model="hr.contract.type">
+        <field name="name">Jóvenes Construyendo el Futuro</field>
+    </record>
+</odoo>

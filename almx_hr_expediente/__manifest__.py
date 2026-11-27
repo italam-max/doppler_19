@@ -1,13 +1,16 @@
 {
     "name": "Alamex - Expediente digital RH",
-    "version": "19.0.1.1.0",
+    "version": "19.0.1.3.0",
     "summary": "Pestaña RRHH / Expediente en el empleado: documentos, psicometría e historial de contratos",
     "author": "Alamex - TDI",
     "license": "LGPL-3",
     "category": "Human Resources/Employees",
-    "depends": ["hr", "hr_recruitment"],
+    "depends": ["hr", "hr_recruitment", "mail", "almx_ajustes_v19"],
     "data": [
         "security/groups.xml",
+        "security/ir.model.access.csv",
+        "data/hr_contract_type_data.xml",
+        "views/contract_change_wizard_views.xml",
         "views/hr_version_views.xml",
         "views/hr_employee_views.xml",
     ],

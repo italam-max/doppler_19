@@ -1,4 +1,9 @@
+import re
+
+from dateutil.relativedelta import relativedelta
+
 from odoo import _, api, fields, models
+from odoo.tools.misc import format_date
 
 # Campos Studio de psicometría en hr.applicant (vienen de Odoo 16) -> campo propio del empleado
 PSICO_FIELDS = {
@@ -60,6 +65,30 @@ def seed_psico_from_applicants(env):
             emp.write(vals)
 
 
+# Tipo de contrato a partir del nombre que traía el contrato de Odoo 16 (orden importa)
+CONTRACT_TYPE_RULES = [
+    (r"j[oó]venes", "almx_hr_expediente.contract_type_jcf"),
+    (r"prueba", "almx_hr_expediente.contract_type_indeterminado_prueba"),
+    (r"indeterminado", "almx_hr_expediente.contract_type_indeterminado"),
+    (r"determinado", "almx_hr_expediente.contract_type_determinado"),
+]
+
+
+def seed_contract_types(env):
+    """Llena el tipo de contrato vacío de las versiones migradas usando su nombre de 16."""
+    Version = env["hr.version"].sudo().with_context(active_test=False, tracking_disable=True)
+    by_type = {}
+    for version in Version.search([("contract_type_id", "=", False), ("name", "!=", False)]):
+        name = version.name.lower()
+        for pattern, xmlid in CONTRACT_TYPE_RULES:
+            if re.search(pattern, name):
+                by_type.setdefault(xmlid, Version)
+                by_type[xmlid] |= version
+                break
+    for xmlid, versions in by_type.items():
+        versions.write({"contract_type_id": env.ref(xmlid).id})
+
+
 class HrApplicant(models.Model):
     _inherit = "hr.applicant"
 
@@ -110,8 +139,50 @@ class HrEmployee(models.Model):
     almx_psico_machover = fields.Binary("Machover", attachment=True, groups=GROUP)
     almx_psico_machover_fname = fields.Char("Archivo Machover", groups=GROUP)
 
+    almx_antiguedad = fields.Char("Antigüedad", compute="_compute_almx_antiguedad")
+    almx_contrato_vigente = fields.Char("Contrato vigente", compute="_compute_almx_contrato_vigente", groups=GROUP)
+    almx_ultimo_movimiento = fields.Char("Último movimiento", compute="_compute_almx_contrato_vigente", groups=GROUP)
+
     def _has_field_access(self, field, operation):
         return _almx_field_access(self, field) and super()._has_field_access(field, operation)
+
+    def _compute_almx_antiguedad(self):
+        today = fields.Date.context_today(self)
+        for emp in self:
+            start = emp["x_studio_fecha_de_ingreso"] if "x_studio_fecha_de_ingreso" in emp._fields else False
+            end = (emp["x_studio_fecha_de_salida"] if "x_studio_fecha_de_salida" in emp._fields else False) or today
+            if not start or end < start:
+                emp.almx_antiguedad = False
+                continue
+            delta = relativedelta(end, start)
+            parts = []
+            if delta.years:
+                parts.append(_("%s año", delta.years) if delta.years == 1 else _("%s años", delta.years))
+            if delta.months:
+                parts.append(_("%s mes", delta.months) if delta.months == 1 else _("%s meses", delta.months))
+            if not parts:
+                parts.append(_("%s día", delta.days) if delta.days == 1 else _("%s días", delta.days))
+            text = ", ".join(parts)
+            if emp["x_studio_fecha_de_salida"] if "x_studio_fecha_de_salida" in emp._fields else False:
+                text = _("%s (hasta su salida)", text)
+            emp.almx_antiguedad = text
+
+    def _compute_almx_contrato_vigente(self):
+        env = self.env
+        for emp in self:
+            version = emp.sudo().version_id
+            if not version:
+                emp.almx_contrato_vigente = emp.almx_ultimo_movimiento = False
+                continue
+            ctype = version.contract_type_id.name or _("Sin tipo de contrato")
+            if version.contract_date_start:
+                period = _("del %(start)s al %(end)s", start=format_date(env, version.contract_date_start),
+                           end=format_date(env, version.contract_date_end)) if version.contract_date_end else \
+                    _("desde el %s (indefinido)", format_date(env, version.contract_date_start))
+                emp.almx_contrato_vigente = "%s, %s" % (ctype, period)
+            else:
+                emp.almx_contrato_vigente = ctype
+            emp.almx_ultimo_movimiento = _("Vigente desde el %s", format_date(env, version.date_version))
 
     def _almx_find_applicant(self):
         """Solicitud ligada al empleado: prioriza la que tenga psicometría."""

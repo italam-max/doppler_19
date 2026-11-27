@@ -62,14 +62,19 @@
                             <field name="almx_psico_machover_fname" invisible="1"/>
                         </group>
                         <group string="Contrato vigente">
+                            <field name="date_version" string="Último movimiento vigente desde" readonly="1"/>
                             <field name="contract_type_id" readonly="1"/>
-                            <field name="contract_date_start" readonly="1"/>
-                            <field name="contract_date_end" readonly="1"/>
-                            <field name="wage" readonly="1"/>
+                            <field name="job_id" string="Puesto" readonly="1"/>
+                            <field name="contract_date_start" string="Inicio del contrato" readonly="1"/>
+                            <field name="contract_date_end" string="Fin del contrato" readonly="1"/>
+                            <field name="wage" string="Salario mensual" readonly="1"/>
                             <field name="x_studio_field_gRCXE" string="Contrato firmado" filename="x_studio_field_gRCXE_filename"/>
                             <field name="x_studio_field_gRCXE_filename" invisible="1"/>
-                            <button name="action_almx_contract_history" type="object" string="Historial de contratos" icon="fa-history" class="btn-secondary" colspan="2"/>
-                            <div class="text-muted" colspan="2">Para un contrato nuevo o aumento: crea una versión con el botón + junto a la fecha (arriba del formulario) y llena tipo, fechas, salario y contrato firmado en la pestaña Nómina.</div>
+                            <div colspan="2" class="d-flex gap-2 mt-2">
+                                <button name="action_almx_contract_change" type="object" string="Registrar movimiento de contrato" icon="fa-file-text-o" class="btn-primary"/>
+                                <button name="action_almx_contract_history" type="object" string="Historial de contratos" icon="fa-history" class="btn-secondary"/>
+                            </div>
+                            <div class="text-muted" colspan="2">Contrato nuevo, renovación, aumento o cambio de puesto: usa "Registrar movimiento de contrato". Queda en el historial y en el chatter con quién lo registró. La fecha de ingreso, antigüedad y contrato vigente también se ven en la pestaña Trabajo.</div>
                         </group>
                         <group string="Otros documentos" invisible="not x_studio_field_QxOXp and not x_studio_field_jH7fy and not x_studio_field_CqmyV">
                             <field name="x_studio_field_QxOXp" string="Pasaporte" filename="x_studio_field_QxOXp_filename"/>
@@ -82,10 +87,32 @@
                     </group>
                 </page>
             </xpath>
+            <!-- La barra nativa de versiones (fechas + "+") no se usa: los movimientos van por el asistente -->
+            <xpath expr="//header/field[@name='version_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
             <xpath expr="//page[@name='payroll_information']//field[@name='contract_type_id']" position="after">
                 <field name="x_studio_field_gRCXE" string="Contrato firmado" filename="x_studio_field_gRCXE_filename"
                        groups="almx_hr_expediente.group_expediente_rh"/>
                 <field name="x_studio_field_gRCXE_filename" invisible="1" groups="almx_hr_expediente.group_expediente_rh"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ingreso y salida (pestaña Trabajo, grupo de almx_ajustes_v19) más completo -->
+    <record id="hr_employee_form_almx_expediente_ingreso" model="ir.ui.view">
+        <field name="name">hr.employee.form.almx.expediente.ingreso</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="almx_ajustes_v19.hr_employee_view_form_almx_ajustes"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='almx_ingreso_salida']" position="inside">
+                <field name="almx_antiguedad" invisible="not almx_antiguedad"/>
+                <field name="almx_contrato_vigente" groups="almx_hr_expediente.group_expediente_rh"/>
+                <field name="almx_ultimo_movimiento" groups="almx_hr_expediente.group_expediente_rh"/>
+                <div colspan="2" class="d-flex gap-3" groups="almx_hr_expediente.group_expediente_rh">
+                    <button name="action_almx_contract_change" type="object" string="Registrar movimiento" icon="fa-file-text-o" class="btn-link p-0"/>
+                    <button name="action_almx_contract_history" type="object" string="Historial de contratos" icon="fa-history" class="btn-link p-0"/>
+                </div>
             </xpath>
         </field>
     </record>
