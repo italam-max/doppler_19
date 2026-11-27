@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Restricción a nivel campo: los documentos del expediente solo los lee el grupo, también por RPC/exportación -->
+    <function model="ir.model.fields" name="write">
+        <value model="ir.model.fields" search="[
+            ('state', '=', 'manual'),
+            '|',
+            '&amp;', ('model', '=', 'hr.applicant'), ('name', 'in', [
+                'x_studio_field_2kQbH', 'x_studio_field_LJGRB', 'x_studio_field_UpoqW', 'x_studio_field_rNDk8']),
+            '&amp;', ('model', '=', 'hr.employee'), ('name', 'in', [
+                'x_studio_field_X5eU7', 'x_studio_field_7yYos', 'x_studio_field_qCV3k', 'x_studio_field_Lc39r',
+                'x_studio_field_hLRzJ', 'x_studio_id_1', 'x_studio_field_4fVwu', 'x_studio_drivers_license_1',
+                'x_studio_military_primer_1', 'x_studio_field_PxX8o', 'x_studio_field_yAgYM', 'x_studio_field_QxOXp',
+                'x_studio_field_jH7fy', 'x_studio_field_CqmyV', 'x_studio_cv', 'x_studio_proof_of_studies',
+                'x_studio_confidenciality_agreement', 'x_studio_job_description_agreement',
+                'x_studio_internal_reguations_agreement', 'x_studio_image_use_consent'])]"/>
+        <value eval="{'groups': [(4, ref('almx_hr_expediente.group_expediente_rh'))]}"/>
+    </function>
+</odoo>

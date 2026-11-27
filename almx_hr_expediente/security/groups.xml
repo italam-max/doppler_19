@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_expediente_rh" model="res.groups">
+        <field name="name">Expediente digital RH</field>
+        <field name="comment">Ve y edita la pestaña RRHH / Expediente del empleado (documentos, psicometría y contratos firmados).</field>
+    </record>
+
+    <!-- Los Gerentes de Empleados heredan el acceso; los Officers (p. ej. Miguel) no, salvo que se agreguen a mano -->
+    <record id="hr.group_hr_manager" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('almx_hr_expediente.group_expediente_rh'))]"/>
+    </record>
+</odoo>

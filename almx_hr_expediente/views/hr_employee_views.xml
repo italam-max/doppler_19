@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_form_almx_expediente" model="ir.ui.view">
+        <field name="name">hr.employee.form.almx.expediente</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='personal_information']" position="after">
+                <page name="almx_expediente_rh" string="RRHH / Expediente" groups="almx_hr_expediente.group_expediente_rh">
+                    <group>
+                        <group string="Identificación">
+                            <field name="x_studio_field_X5eU7" string="Acta de nacimiento" filename="x_studio_field_X5eU7_filename"/>
+                            <field name="x_studio_field_X5eU7_filename" invisible="1"/>
+                            <field name="x_studio_field_7yYos" string="CURP" filename="x_studio_field_7yYos_filename"/>
+                            <field name="x_studio_field_7yYos_filename" invisible="1"/>
+                            <field name="x_studio_field_qCV3k" string="Constancia de situación fiscal (RFC)" filename="x_studio_field_qCV3k_filename"/>
+                            <field name="x_studio_field_qCV3k_filename" invisible="1"/>
+                            <field name="x_studio_id_1" string="Identificación oficial" filename="x_studio_id_1_filename"/>
+                            <field name="x_studio_id_1_filename" invisible="1"/>
+                            <field name="x_studio_field_4fVwu" string="Comprobante de domicilio" filename="x_studio_field_4fVwu_filename"/>
+                            <field name="x_studio_field_4fVwu_filename" invisible="1"/>
+                            <field name="x_studio_drivers_license_1" string="Licencia de conducir" filename="x_studio_drivers_license_1_filename"/>
+                            <field name="x_studio_drivers_license_1_filename" invisible="1"/>
+                            <field name="x_studio_military_primer_1" string="Cartilla militar" filename="x_studio_military_primer_1_filename"/>
+                            <field name="x_studio_military_primer_1_filename" invisible="1"/>
+                        </group>
+                        <group string="Seguridad social y créditos">
+                            <field name="x_studio_field_Lc39r" string="Alta IMSS" filename="x_studio_field_Lc39r_filename"/>
+                            <field name="x_studio_field_Lc39r_filename" invisible="1"/>
+                            <field name="x_studio_field_hLRzJ" string="Documento NSS" filename="x_studio_field_hLRzJ_filename"/>
+                            <field name="x_studio_field_hLRzJ_filename" invisible="1"/>
+                            <field name="x_studio_field_PxX8o" string="INFONAVIT" filename="x_studio_field_PxX8o_filename"/>
+                            <field name="x_studio_field_PxX8o_filename" invisible="1"/>
+                            <field name="x_studio_field_yAgYM" string="FONACOT" filename="x_studio_field_yAgYM_filename"/>
+                            <field name="x_studio_field_yAgYM_filename" invisible="1"/>
+                        </group>
+                        <group string="Ingreso">
+                            <field name="x_studio_cv" string="CV" filename="x_studio_cv_filename"/>
+                            <field name="x_studio_cv_filename" invisible="1"/>
+                            <field name="x_studio_proof_of_studies" string="Comprobante de estudios" filename="x_studio_proof_of_studies_filename"/>
+                            <field name="x_studio_proof_of_studies_filename" invisible="1"/>
+                        </group>
+                        <group string="Acuerdos firmados">
+                            <field name="x_studio_confidenciality_agreement" string="Convenio de confidencialidad" filename="x_studio_confidenciality_agreement_filename"/>
+                            <field name="x_studio_confidenciality_agreement_filename" invisible="1"/>
+                            <field name="x_studio_job_description_agreement" string="Descripción de puesto" filename="x_studio_job_description_agreement_filename"/>
+                            <field name="x_studio_job_description_agreement_filename" invisible="1"/>
+                            <field name="x_studio_internal_reguations_agreement" string="Reglamento interior de trabajo" filename="x_studio_internal_reguations_agreement_filename"/>
+                            <field name="x_studio_internal_reguations_agreement_filename" invisible="1"/>
+                            <field name="x_studio_image_use_consent" string="Consentimiento de uso de imagen" filename="x_studio_image_use_consent_filename"/>
+                            <field name="x_studio_image_use_consent_filename" invisible="1"/>
+                        </group>
+                        <group string="Psicometría (de Reclutamiento)">
+                            <field name="almx_applicant_id" readonly="1"/>
+                            <field name="almx_psico_test" filename="almx_psico_test_fname" readonly="1"/>
+                            <field name="almx_psico_test_fname" invisible="1"/>
+                            <field name="almx_psico_zavic" filename="almx_psico_zavic_fname" readonly="1"/>
+                            <field name="almx_psico_zavic_fname" invisible="1"/>
+                            <field name="almx_psico_rain" filename="almx_psico_rain_fname" readonly="1"/>
+                            <field name="almx_psico_rain_fname" invisible="1"/>
+                            <field name="almx_psico_machover" filename="almx_psico_machover_fname" readonly="1"/>
+                            <field name="almx_psico_machover_fname" invisible="1"/>
+                        </group>
+                        <group string="Contrato (versión mostrada)">
+                            <field name="contract_date_start" readonly="1"/>
+                            <field name="contract_date_end" readonly="1"/>
+                            <field name="x_studio_field_gRCXE" string="Contrato firmado" filename="x_studio_field_gRCXE_filename"/>
+                            <field name="x_studio_field_gRCXE_filename" invisible="1"/>
+                            <button name="action_almx_contract_history" type="object" string="Historial de contratos" icon="fa-history" class="btn-secondary" colspan="2"/>
+                        </group>
+                        <group string="Otros documentos" invisible="not x_studio_field_QxOXp and not x_studio_field_jH7fy and not x_studio_field_CqmyV">
+                            <field name="x_studio_field_QxOXp" string="Pasaporte" filename="x_studio_field_QxOXp_filename"/>
+                            <field name="x_studio_field_QxOXp_filename" invisible="1"/>
+                            <field name="x_studio_field_jH7fy" string="Visa" filename="x_studio_field_jH7fy_filename"/>
+                            <field name="x_studio_field_jH7fy_filename" invisible="1"/>
+                            <field name="x_studio_field_CqmyV" string="Permiso de trabajo" filename="x_studio_field_CqmyV_filename"/>
+                            <field name="x_studio_field_CqmyV_filename" invisible="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
