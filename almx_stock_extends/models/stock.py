@@ -265,13 +265,18 @@ class StockPicking(models.Model):
         return res
 
     def action_set_to_draft(self):
-        if self.state not in ('draft', 'done'):
-            self.action_clear_quantities_to_zero()
-            self.do_unreserve()
-            move = self.env['stock.move'].search([('picking_id', '=', self.id)])
-            for each in move:
-                each.state = 'draft'
-            self.state = 'draft'
+        # v19: action_clear_quantities_to_zero ya no existe.
+        # Limpia cantidades (picked=False + quita reservas) y regresa a
+        # borrador solo los movimientos abiertos (no done/cancel).
+        for picking in self:
+            if picking.state in ('draft', 'done', 'cancel'):
+                continue
+            moves = picking.move_ids.filtered(lambda m: m.state not in ('done', 'cancel'))
+            moves.move_line_ids.picked = False
+            moves.picked = False
+            moves._do_unreserve()
+            moves.write({'state': 'draft'})
+        return True
 
     def action_create_related_out(self):
         self.ensure_one()
