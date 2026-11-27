@@ -36,7 +36,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Inventory',
-    'version': '19.0.13.6',
+    'version': '19.0.13.9',
 
     # any module necessary for this one to work correctly
     'depends': ['base',

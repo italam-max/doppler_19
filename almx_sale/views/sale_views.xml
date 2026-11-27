@@ -12,7 +12,9 @@
                 <field name="collect_date" invisible="not is_immediate" required="state == 'draft' and is_immediate" />
                 <field name="is_so_admin" invisible="1"/>
                 <field name="sale_type" widget="radio" required="state in ('draft', 'sent')" readonly="state == 'sale' and not is_so_admin"/>
-                <field name="completely_paid"/>
+                <field name="completely_paid" invisible="sale_type in ('project', 'modern')"/>
+                <!-- Equipo Nuevo y Modernizacion: mismo campo, otra etiqueta -->
+                <field name="completely_paid" string="Envío de equipo a obra pagado" invisible="sale_type not in ('project', 'modern')"/>
           </xpath>
           <!-- Documentos de proyecto, en la columna derecha. No aplican a Refacciones: si un pedido
                de otro tipo ya tiene archivo o guía, se sigue mostrando para no ocultarlo. -->

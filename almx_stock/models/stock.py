@@ -32,7 +32,11 @@ class StockPicking(models.Model):
     # en codigo por ningun modulo) que no sobrevivieron el upgrade de base de
     # datos a 19. Se recrean aqui como campos propios del modulo, consolidado
     # con not_validate/compute_spare_sale_order, que es lo unico que los usa.
-    x_studio_tipo_de_venta = fields.Selection(related='sale_id.sale_type', string='Tipo de venta', store=True)
+    # 19.0.13.8: venta de origen = sale_id o, en traslados manuales, la SO del Documento origen.
+    almx_origin_sale_id = fields.Many2one('sale.order', string='Venta (SO)', compute='_compute_almx_origin_sale_id', store=True, index=True, readonly=False,
+        help='Venta del traslado. En devoluciones y traslados manuales se puede elegir a mano.')
+    almx_is_return_type = fields.Boolean(compute='_compute_almx_is_return_type')
+    x_studio_tipo_de_venta = fields.Selection(related='almx_origin_sale_id.sale_type', string='Tipo de venta', store=True)
     # x_studio_completamente_pagado: NO es related directo (a diferencia de
     # arriba) porque completely_paid en sale.order esta restringido al grupo
     # de Finanzas (almx_sale.group_can_confirm_sale_payment). Un related
@@ -62,10 +66,10 @@ class StockPicking(models.Model):
     # para conservar el histórico, no se muestra.
     x_studio_adir_evidencia = fields.Boolean(string='Añadir Evidencia')
 
-    @api.depends('sale_id.completely_paid')
+    @api.depends('almx_origin_sale_id.completely_paid')
     def _compute_completamente_pagado(self):
         for rec in self:
-            rec.x_studio_completamente_pagado = rec.sudo().sale_id.completely_paid
+            rec.x_studio_completamente_pagado = rec.sudo().almx_origin_sale_id.completely_paid
     show_request_authorization = fields.Boolean(
         string='Mostrar botón de solicitar autorización',
         compute='_compute_show_request_authorization',
@@ -114,6 +118,12 @@ class StockPicking(models.Model):
         PICK (almx_stock_validate_restriction, regla 3) y cualquier llamada directa lo
         saltaban: en 16 hubo 36 OUT de Refacciones validadas sin pago en 2026."""
         blocked = self.filtered('not_validate')
+        obra = blocked.filtered(lambda p: p.x_studio_tipo_de_venta in ('project', 'modern'))
+        if obra:
+            raise UserError(_(
+                'No se puede validar %(names)s: falta marcar "Envío de equipo a obra pagado" '
+                'en la venta (lo confirma Finanzas).',
+                names=', '.join(obra.mapped('name'))))
         if blocked:
             raise UserError(_(
                 "🚫 No se puede validar %(names)s: es una venta de Refacciones sin pago "
@@ -166,12 +176,29 @@ class StockPicking(models.Model):
         else:
             self.is_account_manager = False
 
+    @api.depends('sale_id', 'origin')
+    def _compute_almx_origin_sale_id(self):
+        """Venta del traslado: la que liga Odoo o, si se creo a mano, la SO escrita en Documento origen."""
+        names = {p.origin.strip() for p in self if not p.sale_id and p.origin}
+        sales = self.env['sale.order'].sudo().search([('name', 'in', list(names))]) if names else self.env['sale.order']
+        by_key = {(so.name, so.company_id.id): so.id for so in sales}
+        for rec in self:
+            match = rec.sale_id.id or (by_key.get((rec.origin.strip(), rec.company_id.id)) if rec.origin else False)
+            # si no hay match se conserva la SO elegida a mano (devoluciones manuales)
+            rec.almx_origin_sale_id = match or rec.almx_origin_sale_id.id
+
+    @api.depends('picking_type_id', 'return_id')
+    def _compute_almx_is_return_type(self):
+        for rec in self:
+            rec.almx_is_return_type = bool(rec.return_id) or rec.picking_type_id.sequence_code == 'RET'
+
+    @api.depends('picking_type_id', 'x_studio_tipo_de_venta', 'x_studio_completamente_pagado')
     def compute_spare_sale_order(self):
         for rec in self:
             op_type = rec.picking_type_id.id
             sale_type = rec.x_studio_tipo_de_venta
             comp_paid = rec.x_studio_completamente_pagado
-            if sale_type == 'spare' and comp_paid != True and op_type == 37: #Aplica solo para movimientos que son OUT
+            if sale_type in ('spare', 'project', 'modern') and not comp_paid and op_type == 37: #Aplica solo para movimientos que son OUT
                 rec.not_validate = True
             else:
                 rec.not_validate = False

@@ -130,8 +130,11 @@
                no conectado a la SO) por los espejos de solo lectura de la SO.
                En 16 estos dos campos se mostraban via una vista de Studio que no
                sobrevivio la migracion. Venta pagada solo la edita Finanzas en la SO. -->
+          <field name="almx_is_return_type" invisible="1"/>
+          <field name="almx_origin_sale_id" invisible="sale_id or (picking_type_code == 'incoming' and not almx_is_return_type)" readonly="state in ('done', 'cancel')" domain="[('state', '=', 'sale'), ('company_id', '=', company_id)]" options="{'no_create': True}"/>
           <field name="x_studio_tipo_de_venta" readonly="1"/>
-          <field name="x_studio_completamente_pagado" string="Venta pagada" readonly="1"/>
+          <field name="x_studio_completamente_pagado" string="Venta pagada" readonly="1" invisible="x_studio_tipo_de_venta in ('project', 'modern')"/>
+          <field name="x_studio_completamente_pagado" string="Envío de equipo a obra pagado" readonly="1" invisible="x_studio_tipo_de_venta not in ('project', 'modern')"/>
           <field name="is_account_manager" invisible="1"/>
           <!-- ALMX (sept 2026, port a 19): URLs de evidencia fotográfica (vista de
                Studio de 16). Almacén/Bodega/Laboratorio en salidas; Calidad también
