@@ -9,6 +9,35 @@ PSICO_FIELDS = {
 }
 GROUP = "almx_hr_expediente.group_expediente_rh"
 
+# Campos Studio del expediente (y su _filename) que solo lee/escribe el grupo.
+# Los grupos en ir.model.fields no aplican a campos manuales en v19, por eso se usa _has_field_access.
+EXPEDIENTE_FIELDS = {
+    "hr.applicant": list(PSICO_FIELDS),
+    "hr.employee": [
+        "x_studio_field_X5eU7", "x_studio_field_7yYos", "x_studio_field_qCV3k", "x_studio_field_Lc39r",
+        "x_studio_field_hLRzJ", "x_studio_id_1", "x_studio_field_4fVwu", "x_studio_drivers_license_1",
+        "x_studio_military_primer_1", "x_studio_field_PxX8o", "x_studio_field_yAgYM", "x_studio_field_QxOXp",
+        "x_studio_field_jH7fy", "x_studio_field_CqmyV", "x_studio_cv", "x_studio_proof_of_studies",
+        "x_studio_confidenciality_agreement", "x_studio_job_description_agreement",
+        "x_studio_internal_reguations_agreement", "x_studio_image_use_consent",
+    ],
+}
+
+
+def _almx_field_access(model, field):
+    names = EXPEDIENTE_FIELDS.get(model._name, ())
+    base = field.name[:-9] if field.name.endswith("_filename") else field.name
+    if base not in names or model.env.su:
+        return True
+    return model.env.user.has_group(GROUP)
+
+
+class HrApplicant(models.Model):
+    _inherit = "hr.applicant"
+
+    def _has_field_access(self, field, operation):
+        return _almx_field_access(self, field) and super()._has_field_access(field, operation)
+
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
@@ -25,6 +54,9 @@ class HrEmployee(models.Model):
     almx_psico_rain_fname = fields.Char(compute="_compute_almx_psico", groups=GROUP)
     almx_psico_machover = fields.Binary("Machover", compute="_compute_almx_psico", groups=GROUP)
     almx_psico_machover_fname = fields.Char(compute="_compute_almx_psico", groups=GROUP)
+
+    def _has_field_access(self, field, operation):
+        return _almx_field_access(self, field) and super()._has_field_access(field, operation)
 
     def _compute_almx_applicant_id(self):
         Applicant = self.env["hr.applicant"]
